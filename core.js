@@ -98,3 +98,17 @@ function fmtDate(d) {
 }
 
 window.FIVE = { getSB, requireAuth, getProfile, signOut, callEdge, toast, fmtNum, fmtMoney, fmtDate };
+
+// 🏢 Get Businesses
+export async function getBusinesses() {
+  const { data, error } = await supabase
+    .from("businesses")
+    .select("*");
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data;
+}
