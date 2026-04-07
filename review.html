@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>قيّم تجربتك</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<script src="/env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/core.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:linear-gradient(160deg,#0B1F4E 0%,#1A3A8F 70%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px;}
+.box{background:rgba(255,255,255,0.97);border-radius:24px;padding:40px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,0.4);text-align:center;}
+.brand{font-family:'Tajawal',sans-serif;font-size:28px;font-weight:900;margin-bottom:6px;direction:ltr;display:inline-block;}
+.b5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
+.bt{color:#0B1F4E;}
+.bname{font-size:20px;font-weight:900;color:#0B1F4E;margin:16px 0 4px;}
+.bsub{font-size:14px;color:#64748B;margin-bottom:28px;}
+.stars{font-size:52px;letter-spacing:4px;margin-bottom:24px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.q{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;color:#0B1F4E;margin-bottom:24px;}
+.btns{display:flex;flex-direction:column;gap:12px;}
+.fbtn{padding:16px;border-radius:16px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;cursor:pointer;border:none;transition:all .25s;}
+.fbtn.h{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;box-shadow:0 6px 24px rgba(212,146,10,0.4);}
+.fbtn.h:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(212,146,10,.5);}
+.fbtn.s{background:rgba(11,31,78,0.06);color:#0B1F4E;border:1.5px solid rgba(11,31,78,.15);}
+.fbtn.s:hover{background:rgba(11,31,78,.1);}
+.result{display:none;animation:fadeIn .4s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.result-icon{font-size:64px;margin-bottom:16px;}
+.result-title{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:#0B1F4E;margin-bottom:8px;}
+.result-sub{font-size:14px;color:#64748B;line-height:1.7;margin-bottom:24px;}
+.result-btn{display:block;width:100%;padding:15px;border-radius:14px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;text-decoration:none;transition:all .25s;border:none;cursor:pointer;}
+.result-btn.google{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;box-shadow:0 6px 24px rgba(212,146,10,.4);}
+.result-btn.google:hover{transform:translateY(-2px);}
+.result-btn.wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 6px 24px rgba(37,211,102,.35);margin-top:10px;}
+.result-btn.wa:hover{transform:translateY(-2px);}
+</style>
+</head>
+<body>
+<div class="box">
+  <div id="survey">
+    <div class="brand"><span class="b5">5</span><span class="bt">tars</span></div>
+    <div class="bname" id="biz-name">محلك</div>
+    <div class="bsub" id="biz-sub">نسعد بخدمتك</div>
+    <div class="stars">⭐⭐⭐⭐⭐</div>
+    <div class="q">كيف كانت تجربتك معنا؟</div>
+    <div class="btns">
+      <button class="fbtn h" onclick="choose('happy')">😊 ممتازة — أريد مشاركة تقييمي!</button>
+      <button class="fbtn s" onclick="choose('sad')">😞 أقل من المتوقع</button>
+    </div>
+  </div>
+  <div class="result" id="result-happy">
+    <div class="result-icon">🌟</div>
+    <div class="result-title">رائع! يسعدنا سماع ذلك</div>
+    <div class="result-sub">تقييمك يساعد العملاء الآخرين على اتخاذ القرار ويشجّعنا على التحسين المستمر</div>
+    <a href="#" id="google-link" class="result-btn google" target="_blank" rel="noopener">⭐ اكتب تقييمك على Google الآن</a>
+  </div>
+  <div class="result" id="result-sad">
+    <div class="result-icon">💙</div>
+    <div class="result-title">نأسف لذلك!</div>
+    <div class="result-sub" id="neg-msg">آسفون على تجربتك! تواصل معنا مباشرة وسنعوضك ونحل مشكلتك فوراً 💚</div>
+    <a href="#" id="wa-link" class="result-btn wa" target="_blank" rel="noopener">📱 تواصل معنا على واتساب</a>
+  </div>
+</div>
+
+<script>
+async function init() {
+  const sb = FIVE.getSB();
+  const uid = new URLSearchParams(window.location.search).get('uid');
+  if (!uid) return;
+
+  const {data:bi} = await sb.from('business_info').select('display_name,google_review_url').eq('user_id',uid).maybeSingle();
+  const {data:pr} = await sb.from('profiles').select('full_name,phone').eq('id',uid).maybeSingle();
+  const {data:settings} = await sb.from('site_settings').select('key,value').in('key',['neg_message','neg_whatsapp']);
+
+  const bizName = bi?.display_name || pr?.full_name || 'محلك';
+  document.getElementById('biz-name').textContent = bizName;
+  document.getElementById('biz-sub').textContent = bizName ? 'نسعد بخدمتك في '+bizName : 'نسعد بخدمتك';
+  document.getElementById('google-link').href = bi?.google_review_url || '#';
+  document.title = 'قيّم ' + bizName;
+
+  const smap = Object.fromEntries((settings||[]).map(s=>[s.key,s.value]));
+  if (smap.neg_message) document.getElementById('neg-msg').textContent = smap.neg_message;
+  const waPhone = smap.neg_whatsapp || (pr?.phone ? 'https://wa.me/'+pr.phone.replace(/\D/g,'') : null);
+  if (waPhone) document.getElementById('wa-link').href = waPhone;
+  else document.getElementById('wa-link').style.display='none';
+}
+
+function choose(type) {
+  document.getElementById('survey').style.display='none';
+  const el=document.getElementById('result-'+type);
+  el.style.display='block';
+}
+
+init();
+</script>
+</body>
+</html>
