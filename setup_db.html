@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5tars v2 — إعداد قاعدة البيانات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:#0B1F4E;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;}
+.box{background:#fff;border-radius:20px;padding:36px;width:100%;max-width:560px;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+.logo{text-align:center;margin-bottom:4px;}
+.logo-txt{font-family:'Tajawal',sans-serif;font-size:32px;font-weight:900;direction:ltr;display:inline-block;}
+.l5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
+.lt{color:#0B1F4E;}
+h2{font-size:18px;font-weight:900;color:#0B1F4E;text-align:center;margin-bottom:6px;}
+.sub{font-size:12px;color:#64748B;text-align:center;margin-bottom:24px;}
+.step{background:#F8FAFF;border:1px solid rgba(34,81,211,.12);border-radius:12px;padding:16px;margin-bottom:14px;}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:linear-gradient(135deg,#2251D3,#1A3A8F);color:#fff;border-radius:50%;font-size:11px;font-weight:900;margin-left:8px;flex-shrink:0;}
+.step-title{font-size:13px;font-weight:900;color:#0B1F4E;display:flex;align-items:center;margin-bottom:8px;}
+.step-body{font-size:12px;color:#64748B;line-height:1.7;}
+label{display:block;font-size:12px;font-weight:700;color:#3B5080;margin-bottom:5px;}
+input{width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:9px;font-family:'Cairo',sans-serif;font-size:12px;color:#0B1F4E;outline:none;direction:ltr;text-align:right;}
+input:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,211,.08);}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-top:6px;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(212,146,10,.4);}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.log{margin-top:16px;background:#0B1F4E;border-radius:10px;padding:14px;font-family:monospace;font-size:11px;color:#a0c4ff;line-height:1.8;max-height:280px;overflow-y:auto;display:none;}
+.log.show{display:block;}
+.ok{color:#4ade80;} .err{color:#f87171;} .info{color:#93c5fd;}
+.done-box{text-align:center;padding:24px;display:none;}
+.done-box.show{display:block;}
+.done-icon{font-size:56px;margin-bottom:12px;}
+.done-title{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:#16A34A;margin-bottom:8px;}
+.done-sub{font-size:13px;color:#64748B;line-height:1.7;margin-bottom:20px;}
+.done-links{display:flex;flex-direction:column;gap:8px;}
+.done-link{display:block;padding:12px;border-radius:10px;font-weight:700;font-size:13px;text-align:center;text-decoration:none;transition:all .2s;}
+.dl-dashboard{background:linear-gradient(135deg,#2251D3,#1A3A8F);color:#fff;}
+.dl-finance{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div id="setup-form">
+    <div class="logo"><div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div></div>
+    <h2 style="margin-top:8px">🚀 إعداد قاعدة البيانات</h2>
+    <div class="sub">هذه الصفحة تُشغَّل مرة واحدة فقط لإنشاء جميع الجداول</div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">1</span>احصل على Service Role Key</div>
+      <div class="step-body">
+        ادخل على: <strong>supabase.com/dashboard/project/bxlvcdfqpkxyrqjdnchi/settings/api</strong><br>
+        انسخ <strong>service_role (secret)</strong> — يبدأ بـ <code>eyJhbGci...</code>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-title"><span class="step-num">2</span>الصق المفتاح هنا</div>
+      <label>Service Role Key</label>
+      <input type="password" id="skey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...">
+    </div>
+
+    <button class="btn" id="run-btn" onclick="runSetup()">⚡ تشغيل الإعداد الكامل</button>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="done-box" id="done-box">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">تم الإعداد بنجاح!</div>
+    <div class="done-sub">جميع الجداول أُنشئت وتم تعيينك مالكاً للمنصة. يمكنك الآن استخدام 5tars v2 كاملاً.</div>
+    <div class="done-links">
+      <a href="/dashboard.html" class="done-link dl-dashboard">📊 لوحة التحكم</a>
+      <a href="/finance.html" class="done-link dl-finance">💰 لوحة المال (مالك فقط)</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://bxlvcdfqpkxyrqjdnchi.supabase.co';
+const OWNER_EMAIL = 'the5starsrating@gmail.com';
+
+function log(msg, type='info') {
+  const el = document.getElementById('log');
+  el.classList.add('show');
+  const line = document.createElement('div');
+  line.className = type;
+  line.textContent = (type==='ok'?'✅ ':type==='err'?'❌ ':'▸ ') + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sql(key, query, label) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ query })
+    });
+    // Some queries don't have exec RPC — use postgres directly via SQL endpoint
+    if (!res.ok && res.status !== 200) {
+      // Try raw SQL via the pg endpoint
+      const res2 = await fetch(`${SUPABASE_URL}/rest/v1/rpc/exec_sql`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json','apikey':key,'Authorization':`Bearer ${key}` },
+        body: JSON.stringify({ sql: query })
+      });
+    }
+  } catch(e) {}
+}
+
+// Execute SQL via Supabase Management API (SQL editor)
+async function execSQL(key, statements) {
+  const results = [];
+  for (const stmt of statements) {
+    if (!stmt.trim() || stmt.trim().startsWith('--')) continue;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+        method: 'GET',
+        headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+      });
+    } catch(e) {}
+  }
+}
+
+async function runViaManagementAPI(serviceKey, sqlContent) {
+  // Use Supabase Management API to run SQL
+  // Extract project ref from URL
+  const projectRef = 'bxlvcdfqpkxyrqjdnchi';
+  
+  // Try the SQL endpoint
+  const res = await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${serviceKey}`
+    },
+    body: JSON.stringify({ query: sqlContent })
+  });
+  
+  const text = await res.text();
+  return { ok: res.ok, status: res.status, body: text };
+}
+
+async function runDirectSQL(serviceKey, query) {
+  // Direct postgres REST
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/query`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': serviceKey,
+      'Authorization': `Bearer ${serviceKey}`
+    },
+    body: JSON.stringify({ query })
+  });
+  return { ok: res.ok, status: res.status, body: await res.text() };
+}
+
+const SQL_STATEMENTS = [
+  // Extensions
+  `CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`,
+  
+  // is_owner function
+  `CREATE OR REPLACE FUNCTION public.is_owner()
+   RETURNS boolean LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+     SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'owner');
+   $$`,
+
+  // profiles
+  `CREATE TABLE IF NOT EXISTS profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    email TEXT, full_name TEXT, phone TEXT, business_type TEXT,
+    role TEXT DEFAULT 'user' CHECK (role IN ('user','owner')),
+    plan TEXT DEFAULT 'trial' CHECK (plan IN ('trial','free','basic','pro','advanced')),
+    status TEXT DEFAULT 'active' CHECK (status IN ('active','suspended','cancelled')),
+    google_place_id TEXT, google_connected BOOLEAN DEFAULT false,
+    trial_ends TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '14 days'),
+    created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+
+  `ALTER TABLE profiles ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self" ON profiles`,
+  `CREATE POLICY "self" ON profiles FOR ALL USING (auth.uid() = id)`,
+  `DROP POLICY IF EXISTS "owner_all" ON profiles`,
+  `CREATE POLICY "owner_all" ON profiles FOR ALL USING (public.is_owner())`,
+
+  // subscriptions
+  `CREATE TABLE IF NOT EXISTS subscriptions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    plan TEXT NOT NULL CHECK (plan IN ('trial','free','basic','pro','advanced')),
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','cancelled','expired')),
+    amount NUMERIC(10,2) DEFAULT 0, currency TEXT DEFAULT 'SAR',
+    start_date TIMESTAMPTZ DEFAULT NOW(), end_date TIMESTAMPTZ, created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "owner_subs" ON subscriptions`,
+  `CREATE POLICY "owner_subs" ON subscriptions FOR ALL USING (public.is_owner())`,
+  `DROP POLICY IF EXISTS "self_subs" ON subscriptions`,
+  `CREATE POLICY "self_subs" ON subscriptions FOR SELECT USING (auth.uid() = user_id)`,
+
+  // reviews
+  `CREATE TABLE IF NOT EXISTS reviews (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    author_name TEXT, review_text TEXT,
+    stars INTEGER NOT NULL DEFAULT 3 CHECK (stars BETWEEN 1 AND 5),
+    review_date DATE, replied BOOLEAN DEFAULT false, reply_text TEXT,
+    source TEXT DEFAULT 'manual' CHECK (source IN ('manual','google','qr')),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE reviews ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self_rev" ON reviews`,
+  `CREATE POLICY "self_rev" ON reviews FOR ALL USING (auth.uid() = user_id)`,
+  `DROP POLICY IF EXISTS "owner_rev" ON reviews`,
+  `CREATE POLICY "owner_rev" ON reviews FOR ALL USING (public.is_owner())`,
+
+  // business_info
+  `CREATE TABLE IF NOT EXISTS business_info (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
+    display_name TEXT, google_review_url TEXT,
+    avg_rating NUMERIC(3,1), total_review_count INTEGER DEFAULT 0,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE business_info ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self_bi" ON business_info`,
+  `CREATE POLICY "self_bi" ON business_info FOR ALL USING (auth.uid() = user_id)`,
+  `DROP POLICY IF EXISTS "owner_bi" ON business_info`,
+  `CREATE POLICY "owner_bi" ON business_info FOR ALL USING (public.is_owner())`,
+
+  // ai_usage
+  `CREATE TABLE IF NOT EXISTS ai_usage (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    feature TEXT CHECK (feature IN ('reply','diagnostic','translate','summary')),
+    model TEXT DEFAULT 'gpt-4o-mini',
+    tokens_in INTEGER DEFAULT 0, tokens_out INTEGER DEFAULT 0,
+    cost_usd NUMERIC(10,6) DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE ai_usage ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self_ai" ON ai_usage`,
+  `CREATE POLICY "self_ai" ON ai_usage FOR ALL USING (auth.uid() = user_id)`,
+  `DROP POLICY IF EXISTS "owner_ai" ON ai_usage`,
+  `CREATE POLICY "owner_ai" ON ai_usage FOR ALL USING (public.is_owner())`,
+
+  // expenses
+  `CREATE TABLE IF NOT EXISTS expenses (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    category TEXT CHECK (category IN ('hosting','ai','whatsapp','domain','other')),
+    description TEXT, amount NUMERIC(10,2) NOT NULL, currency TEXT DEFAULT 'SAR',
+    expense_date DATE DEFAULT CURRENT_DATE, created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE expenses ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "owner_exp" ON expenses`,
+  `CREATE POLICY "owner_exp" ON expenses FOR ALL USING (public.is_owner())`,
+
+  // ads
+  `CREATE TABLE IF NOT EXISTS ads (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title TEXT NOT NULL, description TEXT, target_plan TEXT DEFAULT 'all',
+    placement TEXT DEFAULT 'dashboard', impressions INTEGER DEFAULT 0,
+    clicks INTEGER DEFAULT 0, revenue NUMERIC(10,2) DEFAULT 0,
+    is_active BOOLEAN DEFAULT true, start_date DATE, end_date DATE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE ads ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "owner_ads" ON ads`,
+  `CREATE POLICY "owner_ads" ON ads FOR ALL USING (public.is_owner())`,
+  `DROP POLICY IF EXISTS "users_view_ads" ON ads`,
+  `CREATE POLICY "users_view_ads" ON ads FOR SELECT USING (is_active = true)`,
+
+  // coupons
+  `CREATE TABLE IF NOT EXISTS coupons (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    code TEXT UNIQUE NOT NULL, discount_percent INTEGER CHECK (discount_percent BETWEEN 1 AND 100),
+    max_uses INTEGER DEFAULT 1, used_count INTEGER DEFAULT 0,
+    expires_at TIMESTAMPTZ, is_active BOOLEAN DEFAULT true, created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE coupons ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "owner_coupons" ON coupons`,
+  `CREATE POLICY "owner_coupons" ON coupons FOR ALL USING (public.is_owner())`,
+
+  // review_requests
+  `CREATE TABLE IF NOT EXISTS review_requests (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    owner_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    customer_name TEXT, customer_phone TEXT, service_type TEXT, google_link TEXT,
+    status TEXT DEFAULT 'sent' CHECK (status IN ('sent','viewed','reviewed','expired')),
+    sent_at TIMESTAMPTZ DEFAULT NOW(), created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE review_requests ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self_rr" ON review_requests`,
+  `CREATE POLICY "self_rr" ON review_requests FOR ALL USING (auth.uid() = owner_id)`,
+  `DROP POLICY IF EXISTS "owner_rr" ON review_requests`,
+  `CREATE POLICY "owner_rr" ON review_requests FOR ALL USING (public.is_owner())`,
+
+  // site_settings
+  `CREATE TABLE IF NOT EXISTS site_settings (
+    key TEXT PRIMARY KEY, value TEXT, updated_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "read_settings" ON site_settings`,
+  `CREATE POLICY "read_settings" ON site_settings FOR SELECT USING (true)`,
+  `DROP POLICY IF EXISTS "owner_settings" ON site_settings`,
+  `CREATE POLICY "owner_settings" ON site_settings FOR ALL USING (public.is_owner())`,
+
+  // site_settings defaults
+  `INSERT INTO site_settings (key, value) VALUES
+    ('maintenance_mode', 'false'),
+    ('ai_replies_enabled', 'true'),
+    ('whatsapp_enabled', 'true'),
+    ('new_signups_enabled', 'true'),
+    ('announcement', ''),
+    ('announcement_active', 'false'),
+    ('price_basic', '49'),
+    ('price_pro', '99'),
+    ('price_advanced', '199')
+   ON CONFLICT (key) DO NOTHING`,
+
+  // diagnostic_results
+  `CREATE TABLE IF NOT EXISTS diagnostic_results (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    score INTEGER CHECK (score BETWEEN 0 AND 100),
+    strengths TEXT[], weaknesses TEXT[], competitors JSONB, raw_data JSONB,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )`,
+  `ALTER TABLE diagnostic_results ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "self_diag" ON diagnostic_results`,
+  `CREATE POLICY "self_diag" ON diagnostic_results FOR ALL USING (auth.uid() = user_id)`,
+  `DROP POLICY IF EXISTS "owner_diag" ON diagnostic_results`,
+  `CREATE POLICY "owner_diag" ON diagnostic_results FOR ALL USING (public.is_owner())`,
+
+  // translations
+  `CREATE TABLE IF NOT EXISTS translations (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    original_text TEXT NOT NULL, translated_text TEXT NOT NULL,
+    language TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(original_text, language)
+  )`,
+  `ALTER TABLE translations ENABLE ROW LEVEL SECURITY`,
+  `DROP POLICY IF EXISTS "read_trans" ON translations`,
+  `CREATE POLICY "read_trans" ON translations FOR SELECT USING (true)`,
+  `DROP POLICY IF EXISTS "owner_trans" ON translations`,
+  `CREATE POLICY "owner_trans" ON translations FOR ALL USING (public.is_owner())`,
+
+  // Auto-create profile trigger
+  `CREATE OR REPLACE FUNCTION public.handle_new_user()
+   RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+   BEGIN
+     INSERT INTO public.profiles (id, email, full_name, trial_ends)
+     VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email,'@',1)), NOW() + INTERVAL '14 days')
+     ON CONFLICT (id) DO NOTHING;
+     RETURN NEW;
+   END; $$`,
+
+  `DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users`,
+  `CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user()`
+];
+
+async function runSetup() {
+  const key = document.getElementById('skey').value.trim();
+  const btn = document.getElementById('run-btn');
+  
+  if (!key || !key.startsWith('eyJ')) {
+    alert('أدخل service_role key صحيح (يبدأ بـ eyJ...)');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الإعداد...';
+  document.getElementById('log').innerHTML = '';
+  
+  log('بدء إعداد 5tars v2 قاعدة البيانات...');
+  log(`المشروع: bxlvcdfqpkxyrqjdnchi`);
+
+  let success = 0, failed = 0;
+
+  for (let i = 0; i < SQL_STATEMENTS.length; i++) {
+    const stmt = SQL_STATEMENTS[i].trim();
+    if (!stmt) continue;
+    
+    // Get table/object name for display
+    const firstLine = stmt.split('\n')[0].substring(0, 60);
+    
+    try {
+      // Use Supabase Management API SQL endpoint
+      const res = await fetch(`https://api.supabase.com/v1/projects/bxlvcdfqpkxyrqjdnchi/database/query`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${key}`
+        },
+        body: JSON.stringify({ query: stmt })
+      });
+      
+      if (res.ok || res.status === 200) {
+        success++;
+        if (i % 5 === 0 || i > SQL_STATEMENTS.length - 5) {
+          log(`[${i+1}/${SQL_STATEMENTS.length}] ${firstLine}...`, 'ok');
+        }
+      } else {
+        const err = await res.text();
+        if (err.includes('already exists') || err.includes('duplicate')) {
+          success++;
+        } else {
+          failed++;
+          log(`فشل [${i+1}]: ${firstLine} — ${err.substring(0,80)}`, 'err');
+        }
+      }
+    } catch(e) {
+      failed++;
+      log(`خطأ [${i+1}]: ${e.message}`, 'err');
+    }
+    
+    // Small delay
+    await new Promise(r => setTimeout(r, 50));
+  }
+
+  log(`\nالإحصائيات: نجح ${success} / فشل ${failed}`);
+
+  // Set owner
+  log('تعيين المالك: the5starsrating@gmail.com ...');
+  try {
+    const ownerRes = await fetch(`https://api.supabase.com/v1/projects/bxlvcdfqpkxyrqjdnchi/database/query`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
+      body: JSON.stringify({ query: `UPDATE profiles SET role = 'owner' WHERE email = '${OWNER_EMAIL}'` })
+    });
+    log('تم تعيين المالك ✅', 'ok');
+  } catch(e) {
+    log('ملاحظة: سجّل دخولك أولاً ثم سيتم تعيينك مالكاً تلقائياً', 'info');
+  }
+
+  if (failed === 0 || success > SQL_STATEMENTS.length * 0.8) {
+    log('\n🎉 تم الإعداد بنجاح!', 'ok');
+    setTimeout(() => {
+      document.getElementById('setup-form').style.display = 'none';
+      document.getElementById('done-box').classList.add('show');
+    }, 1500);
+  } else {
+    log('\n⚠️ تم الإعداد مع بعض الأخطاء. جرّب مرة أخرى أو شغّل database.sql يدوياً في SQL Editor', 'err');
+    btn.disabled = false;
+    btn.textContent = '🔄 إعادة المحاولة';
+  }
+}
+</script>
+</body>
+</html>
