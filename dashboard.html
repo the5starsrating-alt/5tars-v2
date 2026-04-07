@@ -665,3 +665,17 @@ init();
 </script>
 </body>
 </html>
+
+<script type="module">
+import { getBusinesses } from './core.js';
+
+async function load() {
+  const data = await getBusinesses();
+
+  document.body.innerHTML += `
+    <pre>${JSON.stringify(data, null, 2)}</pre>
+  `;
+}
+
+load();
+</script>
