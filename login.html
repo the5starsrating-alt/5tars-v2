@@ -10,10 +10,10 @@
 <script src="/core.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;}
+body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px;}
 .card{background:#fff;border-radius:24px;padding:40px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,0.35);}
 .logo{text-align:center;margin-bottom:28px;}
-.logo-txt{font-family:'Tajawal',sans-serif;font-size:36px;font-weight:900;direction:ltr;display:inline-block;}
+.logo-txt{font-family:'Tajawal',sans-serif;font-size:38px;font-weight:900;direction:ltr;display:inline-block;}
 .logo-5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
 .logo-t{color:#0B1F4E;}
 .logo-sub{font-size:11px;letter-spacing:4px;color:#F5B429;display:block;margin-top:2px;}
@@ -25,14 +25,13 @@ input:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,211,.08);}
 .btn{width:100%;padding:14px;background:linear-gradient(135deg,#2251D3,#1A3A8F);color:#fff;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-top:4px;}
 .btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(34,81,211,.35);}
 .btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
-.btn-google{background:#fff;border:1.5px solid #E2E8F0;color:#3B5080;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;}
-.btn-google:hover{border-color:#2251D3;color:#2251D3;box-shadow:none;transform:none;}
-.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:#94A3B8;font-size:12px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:#E2E8F0;}
 .err{background:#FEF2F2;border:1px solid rgba(220,38,38,.2);color:#DC2626;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:12px;display:none;}
 .err.show{display:block;}
 .link{text-align:center;margin-top:20px;font-size:13px;color:#64748B;}
 .link a{color:#2251D3;font-weight:700;text-decoration:none;}
+.forgot{text-align:left;margin-top:6px;}
+.forgot a{font-size:11px;color:#94A3B8;text-decoration:none;}
+.forgot a:hover{color:#2251D3;}
 </style>
 </head>
 <body>
@@ -43,11 +42,18 @@ input:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,211,.08);}
   </div>
   <h2>أهلاً بعودتك 👋</h2>
   <div class="err" id="err"></div>
-
-  <div class="field"><label>البريد الإلكتروني</label><input type="email" id="email" placeholder="you@example.com"></div>
-  <div class="field"><label>كلمة المرور</label><input type="password" id="pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+  <div class="field">
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+  </div>
+  <div class="field">
+    <label>كلمة المرور</label>
+    <input type="password" id="pass" placeholder="••••••••" autocomplete="current-password"
+      onkeydown="if(event.key==='Enter')login()">
+    <div class="forgot"><a href="/reset.html">نسيت كلمة المرور؟</a></div>
+  </div>
   <button class="btn" id="loginBtn" onclick="login()">دخول ←</button>
-  <div class="link">ما عندك حساب؟ <a href="/signup.html">سجّل مجاناً</a> &nbsp;·&nbsp; <a href="/reset.html">نسيت كلمة المرور؟</a></div>
+  <div class="link">ما عندك حساب؟ <a href="/signup.html">سجّل مجاناً — 14 يوم</a></div>
 </div>
 <script>
 async function login() {
@@ -56,16 +62,33 @@ async function login() {
   const err   = document.getElementById('err');
   const btn   = document.getElementById('loginBtn');
   err.classList.remove('show');
-  if (!email || !pass) { err.textContent='أدخل الإيميل وكلمة المرور'; err.classList.add('show'); return; }
-  btn.disabled = true; btn.textContent = '⏳ جاري الدخول...';
+  if (!email || !pass) {
+    err.textContent = 'أدخل الإيميل وكلمة المرور';
+    err.classList.add('show');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الدخول...';
   const sb = FIVE.getSB();
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) { err.textContent = error.message; err.classList.add('show'); btn.disabled=false; btn.textContent='دخول ←'; return; }
+  if (error) {
+    const msgs = {
+      'Invalid login credentials': 'الإيميل أو كلمة المرور غير صحيحة',
+      'Email not confirmed': 'يرجى تأكيد بريدك الإلكتروني أولاً',
+      'Too many requests': 'حاولت كثيراً، انتظر قليلاً'
+    };
+    err.textContent = msgs[error.message] || error.message;
+    err.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'دخول ←';
+    return;
+  }
   window.location.href = '/dashboard.html';
 }
-
-// redirect if already logged in
-FIVE.getSB().auth.getSession().then(({data:{session}}) => { if(session) window.location.href='/dashboard.html'; });
+// إذا مسجّل بالفعل
+FIVE.getSB().auth.getSession().then(({data:{session}}) => {
+  if (session) window.location.href = '/dashboard.html';
+});
 </script>
 </body>
 </html>
