@@ -1,20 +1,11 @@
 -- ═══════════════════════════════════════════════════
--- 5tars v2 — Complete Database Schema
--- نفّذ في Supabase SQL Editor
+-- 5tars v2 — Database Migration (Fixed Order)
 -- ═══════════════════════════════════════════════════
 
--- ── Extensions ──
+-- ── 1. Extensions ──
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ── Helper function ──
-CREATE OR REPLACE FUNCTION public.is_owner()
-RETURNS boolean LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
-  SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'owner');
-$$;
-
--- ════════════════════════════════
--- 1. profiles
--- ════════════════════════════════
+-- ── 2. profiles (أولاً — قبل أي شيء آخر) ──
 CREATE TABLE IF NOT EXISTS profiles (
   id              UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email           TEXT,
@@ -30,15 +21,21 @@ CREATE TABLE IF NOT EXISTS profiles (
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ── 3. is_owner() — بعد profiles ──
+CREATE OR REPLACE FUNCTION public.is_owner()
+RETURNS boolean LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
+  SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'owner');
+$$;
+
+-- ── 4. RLS على profiles ──
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "self" ON profiles;
 CREATE POLICY "self" ON profiles FOR ALL USING (auth.uid() = id);
 DROP POLICY IF EXISTS "owner_all" ON profiles;
 CREATE POLICY "owner_all" ON profiles FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 2. subscriptions
--- ════════════════════════════════
+-- ── 5. subscriptions ──
 CREATE TABLE IF NOT EXISTS subscriptions (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -51,12 +48,12 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "owner_subs" ON subscriptions;
 CREATE POLICY "owner_subs" ON subscriptions FOR ALL USING (public.is_owner());
-CREATE POLICY "self_subs"  ON subscriptions FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "self_subs" ON subscriptions;
+CREATE POLICY "self_subs" ON subscriptions FOR SELECT USING (auth.uid() = user_id);
 
--- ════════════════════════════════
--- 3. reviews
--- ════════════════════════════════
+-- ── 6. reviews ──
 CREATE TABLE IF NOT EXISTS reviews (
   id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -70,12 +67,12 @@ CREATE TABLE IF NOT EXISTS reviews (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "self_rev"  ON reviews FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "self_rev" ON reviews;
+CREATE POLICY "self_rev" ON reviews FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "owner_rev" ON reviews;
 CREATE POLICY "owner_rev" ON reviews FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 4. business_info
--- ════════════════════════════════
+-- ── 7. business_info ──
 CREATE TABLE IF NOT EXISTS business_info (
   id                  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id             UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
@@ -86,12 +83,12 @@ CREATE TABLE IF NOT EXISTS business_info (
   updated_at          TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE business_info ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "self_bi"  ON business_info FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "self_bi" ON business_info;
+CREATE POLICY "self_bi" ON business_info FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "owner_bi" ON business_info;
 CREATE POLICY "owner_bi" ON business_info FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 5. ai_usage — تتبع استهلاك AI
--- ════════════════════════════════
+-- ── 8. ai_usage ──
 CREATE TABLE IF NOT EXISTS ai_usage (
   id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -103,48 +100,47 @@ CREATE TABLE IF NOT EXISTS ai_usage (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE ai_usage ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "self_ai"  ON ai_usage FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "self_ai" ON ai_usage;
+CREATE POLICY "self_ai" ON ai_usage FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "owner_ai" ON ai_usage;
 CREATE POLICY "owner_ai" ON ai_usage FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 6. expenses — تكاليف التشغيل
--- ════════════════════════════════
+-- ── 9. expenses ──
 CREATE TABLE IF NOT EXISTS expenses (
-  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  category    TEXT CHECK (category IN ('hosting','ai','whatsapp','domain','other')),
-  description TEXT,
-  amount      NUMERIC(10,2) NOT NULL,
-  currency    TEXT DEFAULT 'SAR',
-  expense_date DATE DEFAULT CURRENT_DATE,
-  created_at  TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "owner_exp" ON expenses FOR ALL USING (public.is_owner());
-
--- ════════════════════════════════
--- 7. ads — الإعلانات داخل المنصة
--- ════════════════════════════════
-CREATE TABLE IF NOT EXISTS ads (
   id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title        TEXT NOT NULL,
+  category     TEXT CHECK (category IN ('hosting','ai','whatsapp','domain','other')),
   description  TEXT,
-  target_plan  TEXT DEFAULT 'all',
-  placement    TEXT DEFAULT 'dashboard',
-  impressions  INTEGER DEFAULT 0,
-  clicks       INTEGER DEFAULT 0,
-  revenue      NUMERIC(10,2) DEFAULT 0,
-  is_active    BOOLEAN DEFAULT true,
-  start_date   DATE,
-  end_date     DATE,
+  amount       NUMERIC(10,2) NOT NULL,
+  currency     TEXT DEFAULT 'SAR',
+  expense_date DATE DEFAULT CURRENT_DATE,
   created_at   TIMESTAMPTZ DEFAULT NOW()
 );
+ALTER TABLE expenses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "owner_exp" ON expenses;
+CREATE POLICY "owner_exp" ON expenses FOR ALL USING (public.is_owner());
+
+-- ── 10. ads ──
+CREATE TABLE IF NOT EXISTS ads (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title       TEXT NOT NULL,
+  description TEXT,
+  target_plan TEXT DEFAULT 'all',
+  placement   TEXT DEFAULT 'dashboard',
+  impressions INTEGER DEFAULT 0,
+  clicks      INTEGER DEFAULT 0,
+  revenue     NUMERIC(10,2) DEFAULT 0,
+  is_active   BOOLEAN DEFAULT true,
+  start_date  DATE,
+  end_date    DATE,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
 ALTER TABLE ads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "owner_ads" ON ads;
 CREATE POLICY "owner_ads" ON ads FOR ALL USING (public.is_owner());
+DROP POLICY IF EXISTS "users_view_ads" ON ads;
 CREATE POLICY "users_view_ads" ON ads FOR SELECT USING (is_active = true);
 
--- ════════════════════════════════
--- 8. coupons
--- ════════════════════════════════
+-- ── 11. coupons ──
 CREATE TABLE IF NOT EXISTS coupons (
   id               UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code             TEXT UNIQUE NOT NULL,
@@ -156,11 +152,10 @@ CREATE TABLE IF NOT EXISTS coupons (
   created_at       TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "owner_coupons" ON coupons;
 CREATE POLICY "owner_coupons" ON coupons FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 9. review_requests
--- ════════════════════════════════
+-- ── 12. review_requests ──
 CREATE TABLE IF NOT EXISTS review_requests (
   id             UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   owner_id       UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -173,67 +168,52 @@ CREATE TABLE IF NOT EXISTS review_requests (
   created_at     TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE review_requests ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "self_rr"  ON review_requests FOR ALL USING (auth.uid() = owner_id);
+DROP POLICY IF EXISTS "self_rr" ON review_requests;
+CREATE POLICY "self_rr" ON review_requests FOR ALL USING (auth.uid() = owner_id);
+DROP POLICY IF EXISTS "owner_rr" ON review_requests;
 CREATE POLICY "owner_rr" ON review_requests FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 10. site_settings
--- ════════════════════════════════
+-- ── 13. site_settings ──
 CREATE TABLE IF NOT EXISTS site_settings (
   key        TEXT PRIMARY KEY,
   value      TEXT,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "read_settings" ON site_settings;
 CREATE POLICY "read_settings" ON site_settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "owner_settings" ON site_settings;
 CREATE POLICY "owner_settings" ON site_settings FOR ALL USING (public.is_owner());
 
 INSERT INTO site_settings (key, value) VALUES
-  ('maintenance_mode', 'false'),
-  ('ai_replies_enabled', 'true'),
-  ('whatsapp_enabled', 'true'),
+  ('maintenance_mode',    'false'),
+  ('ai_replies_enabled',  'true'),
+  ('whatsapp_enabled',    'true'),
   ('new_signups_enabled', 'true'),
-  ('announcement', ''),
+  ('announcement',        ''),
   ('announcement_active', 'false'),
-  ('openai_model', 'gpt-4o-mini'),
-  ('cost_per_1k_tokens', '0.00015')
+  ('price_basic',         '49'),
+  ('price_pro',           '99'),
+  ('price_advanced',      '199')
 ON CONFLICT (key) DO NOTHING;
 
--- ════════════════════════════════
--- 11. translations cache
--- ════════════════════════════════
-CREATE TABLE IF NOT EXISTS translations (
-  id              UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  original_text   TEXT NOT NULL,
-  translated_text TEXT NOT NULL,
-  language        TEXT NOT NULL,
-  created_at      TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(original_text, language)
-);
-ALTER TABLE translations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "read_trans" ON translations FOR SELECT USING (true);
-CREATE POLICY "owner_trans" ON translations FOR ALL USING (public.is_owner());
-
--- ════════════════════════════════
--- 12. diagnostic_results
--- ════════════════════════════════
+-- ── 14. diagnostic_results ──
 CREATE TABLE IF NOT EXISTS diagnostic_results (
-  id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id      UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  score        INTEGER CHECK (score BETWEEN 0 AND 100),
-  strengths    TEXT[],
-  weaknesses   TEXT[],
-  competitors  JSONB,
-  raw_data     JSONB,
-  created_at   TIMESTAMPTZ DEFAULT NOW()
+  id         UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id    UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  score      INTEGER CHECK (score BETWEEN 0 AND 100),
+  strengths  TEXT[],
+  weaknesses TEXT[],
+  raw_data   JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE diagnostic_results ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "self_diag"  ON diagnostic_results FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "self_diag" ON diagnostic_results;
+CREATE POLICY "self_diag" ON diagnostic_results FOR ALL USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "owner_diag" ON diagnostic_results;
 CREATE POLICY "owner_diag" ON diagnostic_results FOR ALL USING (public.is_owner());
 
--- ════════════════════════════════
--- 13. Auto-create profile trigger
--- ════════════════════════════════
+-- ── 15. Trigger — إنشاء profile تلقائياً ──
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
@@ -243,7 +223,8 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email,'@',1)),
     NOW() + INTERVAL '14 days'
-  ) ON CONFLICT (id) DO NOTHING;
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$;
@@ -253,26 +234,6 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- ════════════════════════════════
--- 14. Financial view
--- ════════════════════════════════
-CREATE OR REPLACE VIEW finance_summary AS
-SELECT
-  DATE_TRUNC('month', s.created_at) AS month,
-  COUNT(DISTINCT s.user_id)          AS new_users,
-  SUM(s.amount)                      AS revenue,
-  (SELECT COALESCE(SUM(amount),0) FROM expenses
-   WHERE DATE_TRUNC('month', expense_date::timestamptz) = DATE_TRUNC('month', s.created_at)
-  )                                  AS expenses_total,
-  SUM(s.amount) - (
-    SELECT COALESCE(SUM(amount),0) FROM expenses
-    WHERE DATE_TRUNC('month', expense_date::timestamptz) = DATE_TRUNC('month', s.created_at)
-  )                                  AS profit
-FROM subscriptions s
-WHERE s.status = 'active'
-GROUP BY 1 ORDER BY 1 DESC;
-
--- ════════════════════════════════
--- 15. Set owner (run once)
--- ════════════════════════════════
--- UPDATE profiles SET role = 'owner' WHERE email = 'YOUR_EMAIL_HERE';
+-- ── 16. تعيين المالك ──
+-- شغّل هذا بعد تسجيل الدخول بإيميلك:
+-- UPDATE profiles SET role = 'owner' WHERE email = 'the5starsrating@gmail.com';
