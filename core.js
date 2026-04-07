@@ -1,3 +1,10 @@
+// 🔗 Supabase Connection
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabaseUrl = "PUT_YOUR_URL";
+const supabaseKey = "PUT_YOUR_KEY";
+
+export const supabase = createClient(supabaseUrl, supabaseKey);
 /* ═══════════════════════════════════════════
    5tars v2 — Core Library
    ═══════════════════════════════════════════ */
