@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5tars — إنشاء حساب مجاني</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<script src="/env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/core.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:24px;}
+.card{background:#fff;border-radius:24px;padding:40px;width:100%;max-width:460px;box-shadow:0 32px 80px rgba(0,0,0,.35);}
+.logo{text-align:center;margin-bottom:8px;}
+.logo-txt{font-family:'Tajawal',sans-serif;font-size:36px;font-weight:900;direction:ltr;display:inline-block;}
+.logo-5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
+.logo-t{color:#0B1F4E;}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#EEF3FF;color:#2251D3;border:1px solid rgba(34,81,211,.2);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
+h2{font-size:20px;font-weight:900;color:#0B1F4E;text-align:center;margin-bottom:24px;}
+.field{margin-bottom:14px;}
+label{display:block;font-size:12px;font-weight:700;color:#3B5080;margin-bottom:5px;}
+input,select{width:100%;padding:12px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;color:#0B1F4E;outline:none;transition:border-color .2s;}
+input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,211,.08);}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .2s;margin-top:6px;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(212,146,10,.4);}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.err{background:#FEF2F2;border:1px solid rgba(220,38,38,.2);color:#DC2626;border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:12px;display:none;}
+.err.show{display:block;}
+.benefits{background:linear-gradient(135deg,#EEF3FF,#F0FDF4);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;flex-direction:column;gap:6px;}
+.ben{font-size:12px;color:#3B5080;display:flex;align-items:center;gap:8px;}
+.link{text-align:center;margin-top:18px;font-size:13px;color:#64748B;}
+.link a{color:#2251D3;font-weight:700;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><div class="logo-txt"><span class="logo-5">5</span><span class="logo-t">tars</span></div></div>
+  <div style="text-align:center;margin-bottom:16px;"><span class="badge">🎁 14 يوم مجاناً — بدون بطاقة</span></div>
+  <h2>أنشئ حسابك الآن</h2>
+  <div class="benefits">
+    <div class="ben">✅ تنبيهات واتساب عند كل تقييم جديد</div>
+    <div class="ben">✅ ردود ذكية بالعربي بضغطة واحدة</div>
+    <div class="ben">✅ QR Code ذكي لمشروعك فوراً</div>
+  </div>
+  <div class="err" id="err"></div>
+  <div class="grid2">
+    <div class="field"><label>الاسم الكامل</label><input type="text" id="name" placeholder="محمد العمري"></div>
+    <div class="field"><label>رقم الواتساب</label><input type="tel" id="phone" placeholder="05xxxxxxxx"></div>
+  </div>
+  <div class="field"><label>البريد الإلكتروني</label><input type="email" id="email" placeholder="you@example.com"></div>
+  <div class="field"><label>كلمة المرور</label><input type="password" id="pass" placeholder="8 أحرف على الأقل"></div>
+  <div class="field">
+    <label>نوع النشاط التجاري</label>
+    <select id="btype">
+      <option value="">اختر...</option>
+      <option value="restaurant">مطعم</option>
+      <option value="cafe">كافيه</option>
+      <option value="salon">صالون تجميل</option>
+      <option value="clinic">عيادة</option>
+      <option value="retail">متجر تجزئة</option>
+      <option value="gym">نادي رياضي</option>
+      <option value="hotel">فندق / شقق</option>
+      <option value="other">أخرى</option>
+    </select>
+  </div>
+  <button class="btn" id="regBtn" onclick="register()">ابدأ تجربتي المجانية ←</button>
+  <div class="link">عندك حساب؟ <a href="/login.html">سجّل دخول</a></div>
+</div>
+<script>
+async function register() {
+  const name  = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const pass  = document.getElementById('pass').value;
+  const btype = document.getElementById('btype').value;
+  const err   = document.getElementById('err');
+  const btn   = document.getElementById('regBtn');
+  err.classList.remove('show');
+  if (!name||!email||!pass) { err.textContent='الاسم والإيميل وكلمة المرور مطلوبة'; err.classList.add('show'); return; }
+  if (pass.length < 8) { err.textContent='كلمة المرور 8 أحرف على الأقل'; err.classList.add('show'); return; }
+  btn.disabled=true; btn.textContent='⏳ جاري التسجيل...';
+  const sb = FIVE.getSB();
+  const { data, error } = await sb.auth.signUp({ email, password: pass,
+    options: { data: { full_name: name, phone, business_type: btype } }
+  });
+  if (error) { err.textContent=error.message; err.classList.add('show'); btn.disabled=false; btn.textContent='ابدأ تجربتي المجانية ←'; return; }
+  // update profile
+  if (data.user) {
+    await sb.from('profiles').upsert({ id: data.user.id, email, full_name: name, phone, business_type: btype });
+  }
+  window.location.href = '/dashboard.html';
+}
+</script>
+</body>
+</html>
