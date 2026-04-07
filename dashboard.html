@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5tars — لوحة التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+<script src="/env.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/core.js"></script>
+<style>
+:root{
+  --ink:#0B1F4E; --ink2:#1A3A8F; --blue:#2251D3; --blue-l:#EEF3FF;
+  --gold:#D4920A; --gold2:#F5B429; --gold-l:#FFF8E7;
+  --green:#16A34A; --red:#DC2626;
+  --bg:#F0F4FF; --card:#fff; --border:rgba(34,81,211,.1);
+  --muted:#64748B; --sidebar:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;}
+
+/* ── SIDEBAR ── */
+.sb{position:fixed;top:0;right:0;bottom:0;width:var(--sidebar);
+  background:linear-gradient(160deg,var(--ink) 0%,var(--ink2) 100%);
+  display:flex;flex-direction:column;z-index:100;overflow-y:auto;}
+.sb-logo{padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.logo-box{display:inline-flex;flex-direction:column;align-items:center;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:6px 14px;}
+.logo-5{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;font-style:italic;
+  background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.logo-t{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1;}
+.logo-s{color:var(--gold2);font-size:8px;letter-spacing:3px;}
+.sb-user{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold2),var(--gold));
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:var(--ink);margin-bottom:6px;}
+.uname{font-size:13px;font-weight:700;color:#fff;}
+.uplan{font-size:10px;color:var(--gold2);background:rgba(245,180,41,.15);border:1px solid rgba(245,180,41,.3);
+  border-radius:20px;padding:2px 10px;display:inline-block;margin-top:3px;}
+.sb-nav{padding:14px 10px;flex:1;}
+.ni{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:9px;
+  color:rgba(255,255,255,.6);font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .2s;margin-bottom:3px;border:none;background:none;width:100%;
+  text-align:right;font-family:'Cairo',sans-serif;}
+.ni:hover{background:rgba(255,255,255,.08);color:#fff;}
+.ni.on{background:rgba(255,255,255,.13);color:#fff;}
+.ni i{width:18px;text-align:center;font-size:14px;}
+.nbadge{margin-right:auto;background:var(--gold2);color:var(--ink);
+  font-size:9px;font-weight:900;padding:2px 7px;border-radius:20px;}
+.sb-foot{padding:14px 10px;border-top:1px solid rgba(255,255,255,.08);}
+.logout-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;
+  color:rgba(255,255,255,.35);font-size:12px;font-weight:600;cursor:pointer;
+  transition:all .2s;border:none;background:none;font-family:'Cairo',sans-serif;width:100%;}
+.logout-btn:hover{color:#fff;background:rgba(220,38,38,.2);}
+
+/* ── MAIN ── */
+.main{margin-right:var(--sidebar);min-height:100vh;padding:24px;}
+.sec{display:none;}
+.sec.on{display:block;}
+
+/* ── HEADER ── */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.pt{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;}
+.ps{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ── STATS ── */
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s;cursor:default;}
+.sc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(11,31,78,.08);}
+.sc-icon{font-size:20px;margin-bottom:8px;}
+.sc-num{font-family:'Tajawal',sans-serif;font-size:28px;font-weight:900;line-height:1;margin-bottom:3px;}
+.sc-label{font-size:11px;color:var(--muted);}
+.sc-change{font-size:10px;font-weight:700;margin-top:4px;}
+.sc.blue .sc-num{color:var(--blue);}
+.sc.gold .sc-num{color:var(--gold);}
+.sc.green .sc-num{color:var(--green);}
+.sc.red .sc-num{color:var(--red);}
+.sc-change.up{color:var(--green);} .sc-change.dn{color:var(--red);}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.ct{font-size:14px;font-weight:900;display:flex;align-items:center;gap:7px;}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:9px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:none;display:inline-flex;align-items:center;gap:5px;}
+.bp{background:linear-gradient(135deg,var(--blue),var(--ink2));color:#fff;}
+.bp:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(34,81,211,.3);}
+.bg{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--ink);}
+.bg:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(212,146,10,.3);}
+.bo{background:transparent;border:1.5px solid var(--border);color:var(--ink);}
+.bo:hover{border-color:var(--blue);color:var(--blue);}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;}
+
+/* ── REVIEWS ── */
+.rv{border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:10px;transition:all .2s;}
+.rv:hover{border-color:rgba(34,81,211,.2);}
+.rv-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;}
+.rv-name{font-size:13px;font-weight:700;}
+.rv-date{font-size:10px;color:var(--muted);}
+.stars{color:var(--gold2);font-size:13px;letter-spacing:1px;margin:2px 0;}
+.rv-text{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px;}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.b-ok{background:#DCFCE7;color:#15803D;} .b-wait{background:#FEF3C7;color:#92400E;} .b-bad{background:#FEE2E2;color:#991B1B;}
+.empty{text-align:center;padding:48px 16px;color:var(--muted);}
+.empty-icon{font-size:40px;margin-bottom:12px;}
+.empty h3{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--ink);}
+.empty p{font-size:12px;line-height:1.7;}
+
+/* ── CONNECT BANNER ── */
+.cbanner{background:linear-gradient(135deg,var(--ink),var(--ink2));border-radius:14px;padding:22px;color:#fff;display:flex;align-items:center;gap:18px;margin-bottom:20px;flex-wrap:wrap;}
+.cbanner h3{font-size:16px;font-weight:900;margin-bottom:4px;}
+.cbanner p{font-size:12px;opacity:.75;}
+.cbanner .cta{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--ink);border:none;border-radius:10px;padding:10px 22px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;cursor:pointer;margin-right:auto;transition:all .2s;white-space:nowrap;}
+.cbanner .cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,146,10,.4);}
+
+/* ── QR ── */
+.qr-wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;}
+.qr-box{background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px;text-align:center;min-width:200px;}
+.qr-form{flex:1;min-width:260px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Cairo',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(34,81,211,.06);}
+
+/* ── TOGGLE ── */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.trow:last-child{border-bottom:none;}
+.tinfo .tl{font-size:13px;font-weight:700;} .tinfo .ts{font-size:11px;color:var(--muted);margin-top:1px;}
+.toggle{width:42px;height:22px;background:var(--border);border-radius:20px;position:relative;cursor:pointer;transition:all .3s;flex-shrink:0;}
+.toggle.on{background:var(--blue);}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{right:auto;left:2px;}
+
+/* ── SETTINGS ── */
+.sgrid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* ── FILTER PAGE ── */
+.fp{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:14px;padding:28px;text-align:center;color:#fff;margin-bottom:16px;}
+.fp-stars{font-size:44px;letter-spacing:3px;margin-bottom:14px;}
+.fp-q{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;margin-bottom:6px;}
+.fp-s{font-size:12px;opacity:.65;}
+.fp-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+.fbtn{padding:11px 26px;border-radius:30px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.fbtn.h{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;}
+.fbtn.s{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+
+/* ── LOADING ── */
+.overlay{position:fixed;inset:0;background:rgba(11,31,78,.5);display:flex;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(4px);}
+.overlay-box{background:#fff;border-radius:18px;padding:36px;text-align:center;}
+.spinner{width:44px;height:44px;border:4px solid var(--blue-l);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SUGGESTIONS ── */
+.sugg{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;}
+.sugg.hp{border-right:4px solid #ef4444;} .sugg.mp{border-right:4px solid var(--gold2);} .sugg.lp{border-right:4px solid #22c55e;}
+.sugg-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
+.ic-r{background:rgba(239,68,68,.1);color:#ef4444;} .ic-g{background:rgba(245,180,41,.1);color:var(--gold2);} .ic-gr{background:rgba(34,197,94,.1);color:#22c55e;} .ic-b{background:rgba(34,81,211,.1);color:var(--blue);}
+.sugg-t{font-size:13px;font-weight:800;margin-bottom:4px;}
+.sugg-d{font-size:12px;color:var(--muted);line-height:1.7;}
+.sugg-a{margin-top:8px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;font-family:'Cairo',sans-serif;}
+.sugg-a:hover{text-decoration:underline;}
+
+@media(max-width:768px){
+  .sb{display:none;} .main{margin-right:0;padding:14px;}
+  .sgrid{grid-template-columns:repeat(2,1fr);} .sgrid2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="ov"><div class="overlay-box"><div class="spinner"></div><div style="font-weight:700;color:var(--ink)">جاري التحميل...</div></div></div>
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div>
+  <div class="sb-user">
+    <div class="av" id="av">م</div>
+    <div class="uname" id="uname">...</div>
+    <div class="uplan" id="uplan">تجربة مجانية</div>
+  </div>
+  <div class="sb-nav">
+    <button class="ni on" onclick="show('overview',this)"><i class="fa-solid fa-chart-line fa-fw"></i>نظرة عامة</button>
+    <button class="ni" onclick="show('reviews',this)"><i class="fa-solid fa-star fa-fw"></i>التقييمات<span class="nbadge" id="pb" style="display:none">0</span></button>
+    <button class="ni" onclick="show('suggestions',this)"><i class="fa-solid fa-lightbulb fa-fw"></i>اقتراحات ذكية</button>
+    <button class="ni" onclick="show('qr',this)"><i class="fa-solid fa-qrcode fa-fw"></i>QR Code</button>
+    <button class="ni" onclick="show('filter',this)"><i class="fa-solid fa-shield-halved fa-fw"></i>فلتر التقييمات</button>
+    <button class="ni" onclick="show('request',this)"><i class="fa-solid fa-paper-plane fa-fw"></i>طلب تقييم</button>
+    <button class="ni" onclick="show('settings',this)"><i class="fa-solid fa-gear fa-fw"></i>الإعدادات</button>
+  </div>
+  <div class="sb-foot"><button class="logout-btn" onclick="FIVE.signOut()"><i class="fa-solid fa-right-from-bracket"></i>تسجيل الخروج</button></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ── OVERVIEW ── -->
+<div class="sec on" id="s-overview">
+  <div class="ph">
+    <div><div class="pt">مرحباً، <span id="hname">...</span> 👋</div><div class="ps">ملخص نشاطك على Google Business</div></div>
+    <button class="btn bg" onclick="show('qr',document.querySelector('.ni:nth-child(4)'))"><i class="fa-solid fa-qrcode"></i>QR Code</button>
+  </div>
+  <div id="cbanner" class="cbanner" style="display:none">
+    <div style="font-size:40px">🔗</div>
+    <div><h3>اربط Google Business</h3><p>لمراقبة تقييماتك والرد عليها آلياً</p></div>
+    <button class="cta" onclick="openGoogleModal()">ربط Google Business ←</button>
+  </div>
+  <div class="sgrid">
+    <div class="sc blue"><div class="sc-icon">⭐</div><div class="sc-num" id="st-rating">—</div><div class="sc-label">متوسط التقييم</div><div class="sc-change up" id="st-rch">من بياناتك</div></div>
+    <div class="sc gold"><div class="sc-icon">💬</div><div class="sc-num" id="st-total">0</div><div class="sc-label">إجمالي التقييمات</div><div class="sc-change up">من Google</div></div>
+    <div class="sc green"><div class="sc-icon">✅</div><div class="sc-num" id="st-replied">0</div><div class="sc-label">تم الرد عليها</div><div class="sc-change up" id="st-rate">نسبة الرد</div></div>
+    <div class="sc red"><div class="sc-icon">⏳</div><div class="sc-num" id="st-pending">0</div><div class="sc-label">تنتظر الرد</div><div class="sc-change dn">ردّ عليها الآن</div></div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold)"></i>اقتراحات الذكاء الاصطناعي</div></div>
+    <div id="ai-tips" style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--muted);line-height:1.8;">
+      <div>✦ <strong>سرعة الرد:</strong> الرد خلال 24 ساعة يرفع ثقة العملاء ويحسّن إشارات Google.</div>
+      <div>✦ <strong>QR Code:</strong> ضعه على الطاولة أو الفاتورة — يضاعف التقييمات 3 أضعاف.</div>
+      <div>✦ <strong>الشكاوى:</strong> وجّهها لواتساب خاص بدل Google حتى لا تتراكم التقييمات السلبية.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ct"><i class="fa-solid fa-star" style="color:var(--gold)"></i>آخر التقييمات</div>
+      <button class="btn bo" onclick="show('reviews',document.querySelector('.ni:nth-child(2)'))">عرض الكل ←</button></div>
+    <div id="recent-list"><div class="empty"><div class="empty-icon">⭐</div><h3>لا توجد تقييمات بعد</h3><p>أضف رابط Google Business ثم اضغط تحديث</p></div></div>
+  </div>
+</div>
+
+<!-- ── SUGGESTIONS ── -->
+<div class="sec" id="s-suggestions">
+  <div class="ph"><div><div class="pt">الاقتراحات الذكية 💡</div><div class="ps">توصيات مخصصة بناءً على بياناتك</div></div></div>
+  <div id="sugg-list"><div class="empty"><div class="empty-icon">💡</div><h3>جاري التحليل...</h3></div></div>
+</div>
+
+<!-- ── REVIEWS ── -->
+<div class="sec" id="s-reviews">
+  <div class="ph">
+    <div><div class="pt">⭐ إدارة التقييمات</div><div class="ps">راقب وارد على تقييماتك من مكان واحد</div></div>
+    <button class="btn bp" onclick="fetchReviews()"><i class="fa-solid fa-rotate"></i>تحديث من Google</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="btn bo" onclick="filterRv('all',this)" id="f-all">الكل</button>
+      <button class="btn bo" onclick="filterRv('pending',this)">⏳ لم يُرد</button>
+      <button class="btn bo" onclick="filterRv('replied',this)">✅ تم الرد</button>
+      <button class="btn bo" onclick="filterRv('bad',this)">⚠️ سلبية</button>
+    </div>
+    <div id="rv-list"><div class="empty"><div class="empty-icon"><i class="fa-brands fa-google" style="font-size:40px;color:var(--blue)"></i></div><h3>لا توجد تقييمات محمّلة بعد</h3><p>أضف رابط Google Business في الإعدادات ثم اضغط تحديث</p></div></div>
+  </div>
+</div>
+
+<!-- ── QR ── -->
+<div class="sec" id="s-qr">
+  <div class="ph"><div><div class="pt">📱 QR Code الذكي</div><div class="ps">سعيد → Google · غير سعيد → واتساب</div></div></div>
+  <div class="card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE;margin-bottom:14px;">
+    <div style="display:flex;gap:12px;"><div style="font-size:28px">🎯</div><div><div style="font-size:13px;font-weight:800;color:#1E40AF;margin-bottom:4px;">كيف يعمل الباركود الذكي؟</div><div style="font-size:12px;color:#1E3A8A;line-height:1.8;">العميل يمسح الباركود ← يظهر له:<br>😊 سعيد → يُوجَّه لـ Google<br>😟 غير سعيد → يُوجَّه لواتساب</div></div></div>
+  </div>
+  <div class="card">
+    <div class="qr-wrap">
+      <div class="qr-box">
+        <div style="font-size:12px;font-weight:700;margin-bottom:10px;">امسح للتقييم</div>
+        <div id="qrcode" style="display:flex;justify-content:center;margin:12px 0;"></div>
+        <div style="font-size:10px;color:var(--muted);word-break:break-all;" id="qr-url"></div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;">
+          <button class="btn bp" onclick="dlQR()">⬇️ تحميل</button>
+          <button class="btn bo" onclick="window.print()">🖨️ طباعة</button>
+        </div>
+      </div>
+      <div class="qr-form">
+        <div class="field"><label>اسم المحل</label><input type="text" id="qr-name" placeholder="مطعم الوادي" oninput="genQR()"></div>
+        <div class="field"><label>رابط Google Review (اختياري)</label><input type="url" id="qr-link" placeholder="https://g.page/r/..." oninput="genQR()"></div>
+        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:10px;font-size:11px;color:#166534;margin-top:8px;">✅ الباركود يوجّه لصفحة review.html الذكية الخاصة بحسابك تلقائياً</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FILTER ── -->
+<div class="sec" id="s-filter">
+  <div class="ph"><div><div class="pt">🛡️ فلتر التقييمات</div><div class="ps">وجّه الراضين لـ Google والغير راضين لرسالة خاصة</div></div></div>
+  <div class="card">
+    <div class="ch"><div class="ct">👁️ معاينة الصفحة</div><span style="font-size:11px;color:var(--muted)">هكذا يشوف عميلك</span></div>
+    <div class="fp">
+      <div class="fp-stars">⭐⭐⭐⭐⭐</div>
+      <div class="fp-q" id="fp-biz">محلك</div>
+      <div class="fp-s">كيف كانت تجربتك معنا؟</div>
+      <div class="fp-btns">
+        <button class="fbtn h" onclick="fdemo('h')">😊 ممتازة — شارك تقييمك!</button>
+        <button class="fbtn s" onclick="fdemo('s')">😞 أقل من ممتاز</button>
+      </div>
+    </div>
+    <div id="fdemo-res" style="display:none;background:var(--blue-l);border-radius:10px;padding:16px;text-align:center;font-weight:700;color:var(--ink2);"></div>
+  </div>
+  <div class="card">
+    <div class="ct" style="margin-bottom:14px;">⚙️ إعدادات الفلتر</div>
+    <div class="field"><label>رسالة للعميل غير الراضي</label><textarea id="neg-msg" rows="3">آسفون على تجربتك! تواصل معنا على واتساب وسنحل مشكلتك فوراً 💚</textarea></div>
+    <div class="field"><label>رابط واتساب للشكاوى</label><input type="text" id="neg-wa" placeholder="https://wa.me/966xxxxxxxxx"></div>
+    <button class="btn bp" onclick="saveFilter()">💾 حفظ</button>
+  </div>
+</div>
+
+<!-- ── REQUEST ── -->
+<div class="sec" id="s-request">
+  <div class="ph"><div><div class="pt">📨 طلب تقييم</div><div class="ps">أرسل طلب تقييم لعملائك عبر واتساب</div></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="ct" style="margin-bottom:18px;">📱 إرسال طلب جديد</div>
+      <div class="field"><label>اسم العميل</label><input type="text" id="rq-name" placeholder="محمد العمري"></div>
+      <div class="field"><label>رقم الواتساب</label><input type="tel" id="rq-phone" placeholder="966xxxxxxxxx" style="direction:ltr;text-align:right"></div>
+      <div class="field"><label>نوع الخدمة</label><input type="text" id="rq-service" placeholder="وجبة عشاء / قص شعر..."></div>
+      <div class="field"><label>رابط Google Review</label><input type="url" id="rq-glink" placeholder="https://g.page/r/..." style="direction:ltr;text-align:right"></div>
+      <button class="btn bp" style="width:100%;margin-top:6px;" onclick="sendRequest()">📨 أرسل طلب التقييم</button>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center">سيُرسل تذكير تلقائي بعد 24 ساعة</div>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:16px;">📊 آخر الطلبات</div>
+      <div id="rq-list"><div class="empty"><div class="empty-icon">📨</div><h3>لا توجد طلبات بعد</h3></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SETTINGS ── -->
+<div class="sec" id="s-settings">
+  <div class="ph"><div><div class="pt">⚙️ الإعدادات</div><div class="ps">تحكم في حسابك ومشروعك</div></div></div>
+  <div class="sgrid2">
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">🔔 الإشعارات</div>
+      <div class="trow"><div class="tinfo"><div class="tl">إشعار واتساب عند تقييم جديد</div><div class="ts">يصلك فوراً عند كل تقييم</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="trow"><div class="tinfo"><div class="tl">رد تلقائي بالذكاء الاصطناعي</div><div class="ts">يرد تلقائياً بعد موافقتك</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="trow"><div class="tinfo"><div class="tl">تنبيه التقييمات السلبية</div><div class="ts">إشعار خاص لتقييمات أقل من 3</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="trow"><div class="tinfo"><div class="tl">تقرير أسبوعي</div><div class="ts">ملخص كل جمعة</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">👤 معلومات الحساب</div>
+      <div class="field"><label>الاسم الكامل</label><input type="text" id="s-name"></div>
+      <div class="field"><label>رقم الواتساب</label><input type="tel" id="s-phone"></div>
+      <div class="field"><label>نوع النشاط</label>
+        <select id="s-btype">
+          <option value="restaurant">مطعم</option><option value="cafe">كافيه</option>
+          <option value="salon">صالون</option><option value="clinic">عيادة</option>
+          <option value="retail">متجر</option><option value="other">أخرى</option>
+        </select>
+      </div>
+      <button class="btn bp" onclick="saveSettings()">💾 حفظ التغييرات</button>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">📦 باقتك الحالية</div>
+      <div style="background:linear-gradient(135deg,var(--ink),var(--ink2));border-radius:10px;padding:18px;color:#fff;text-align:center;margin-bottom:14px;">
+        <div style="font-size:11px;opacity:.6;margin-bottom:4px;">باقتك الحالية</div>
+        <div style="font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:var(--gold2)" id="s-plan">تجربة مجانية</div>
+        <div style="font-size:11px;opacity:.6;margin-top:3px;" id="s-trial">14 يوم متبقية</div>
+      </div>
+      <button class="btn bg" style="width:100%">⬆️ ترقية الباقة</button>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">🔗 ربط Google Business</div>
+      <div id="g-status" style="background:var(--blue-l);border-radius:9px;padding:12px;text-align:center;margin-bottom:14px;">
+        <div style="font-size:22px;margin-bottom:6px">🔗</div>
+        <div style="font-size:12px;color:var(--muted)">لم يتم الربط بعد</div>
+      </div>
+      <button class="btn bp" style="width:100%" onclick="openGoogleModal()">ربط Google Business</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<!-- Google Modal -->
+<div id="g-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:18px;padding:28px;max-width:440px;width:90%;direction:rtl;">
+    <h3 style="font-family:Cairo;font-size:17px;font-weight:900;color:var(--ink);margin-bottom:14px;">🔗 ربط Google Business</h3>
+    <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:14px;">افتح Google Maps ← ابحث عن محلك ← اضغط "مشاركة" ← انسخ الرابط</p>
+    <input type="url" id="g-link" placeholder="https://maps.app.goo.gl/..." style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:Cairo;font-size:13px;outline:none;margin-bottom:10px;direction:ltr;text-align:right;">
+    <div id="g-err" style="display:none;background:#FEF2F2;color:var(--red);border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="document.getElementById('g-modal').style.display='none'" style="padding:10px 18px;border:1.5px solid var(--border);border-radius:9px;background:#fff;font-family:Cairo;cursor:pointer;">إلغاء</button>
+      <button id="g-save-btn" onclick="saveGoogleLink()" style="padding:10px 18px;background:linear-gradient(135deg,var(--blue),var(--ink2));color:#fff;border:none;border-radius:9px;font-family:Cairo;font-weight:700;cursor:pointer;">حفظ الرابط</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let sb, user, profile, _reviews = [];
+
+async function init() {
+  sb = FIVE.getSB();
+  const sess = await FIVE.requireAuth();
+  if (!sess) return;
+  user = sess.user;
+
+  profile = await FIVE.getProfile(user.id);
+  if (!profile) { FIVE.toast('تعذّر تحميل بيانات الملف الشخصي','error'); }
+
+  // Fill UI
+  const name = profile?.full_name || user.email.split('@')[0];
+  document.getElementById('av').textContent    = name.charAt(0).toUpperCase();
+  document.getElementById('uname').textContent = name;
+  document.getElementById('hname').textContent = name.split(' ')[0];
+  document.getElementById('uplan').textContent = planLabel(profile?.plan);
+  document.getElementById('s-plan').textContent = planLabel(profile?.plan);
+  document.getElementById('s-name').value  = profile?.full_name || '';
+  document.getElementById('s-phone').value = profile?.phone || '';
+  if (profile?.business_type) document.getElementById('s-btype').value = profile.business_type;
+  if (profile?.full_name) { document.getElementById('qr-name').value = profile.full_name; document.getElementById('fp-biz').textContent = profile.full_name; }
+
+  if (profile?.trial_ends) {
+    const days = Math.max(0, Math.ceil((new Date(profile.trial_ends) - new Date()) / 86400000));
+    document.getElementById('s-trial').textContent = days + ' يوم متبقية';
+  }
+
+  if (!profile?.google_connected) document.getElementById('cbanner').style.display = 'flex';
+  else {
+    document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div><div style="font-size:10px;color:var(--muted);margin-top:3px;word-break:break-all">${(profile.google_place_id||'').substring(0,45)}...</div>`;
+    if (profile.google_place_id) document.getElementById('qr-link').value = profile.google_place_id;
+  }
+
+  // Load data
+  await loadData();
+  genQR();
+  buildSuggestions();
+
+  document.getElementById('ov').style.display = 'none';
+}
+
+function planLabel(p) {
+  return {trial:'تجربة مجانية',free:'مجاني',basic:'أساسي',pro:'احترافي',advanced:'متقدم'}[p] || 'تجربة مجانية';
+}
+
+async function loadData() {
+  const [biRes, rvRes] = await Promise.all([
+    sb.from('business_info').select('*').eq('user_id', user.id).maybeSingle(),
+    sb.from('reviews').select('*').eq('user_id', user.id).order('created_at',{ascending:false})
+  ]);
+  const bi = biRes.data;
+  _reviews = rvRes.data || [];
+
+  const total   = bi?.total_review_count ?? _reviews.length;
+  const replied = _reviews.filter(r=>r.replied).length;
+  const pending = _reviews.length - replied;
+  const avg     = bi?.avg_rating || (_reviews.length ? (_reviews.reduce((s,r)=>s+r.stars,0)/_reviews.length).toFixed(1) : 0);
+
+  document.getElementById('st-rating').textContent  = avg || '—';
+  document.getElementById('st-total').textContent   = total;
+  document.getElementById('st-replied').textContent = replied;
+  document.getElementById('st-pending').textContent = pending;
+  document.getElementById('st-rch').textContent     = avg >= 4.5 ? '🌟 ممتاز' : avg >= 4 ? '👍 جيد' : avg >= 3 ? '⚠️ متوسط' : '—';
+  document.getElementById('st-rate').textContent    = _reviews.length ? `نسبة رد ${Math.round(replied/_reviews.length*100)}%` : 'نسبة الرد';
+
+  const pb = document.getElementById('pb');
+  if (pending > 0) { pb.textContent = pending; pb.style.display = ''; }
+
+  renderReviews(_reviews);
+  renderRecent(_reviews.slice(0,3));
+}
+
+function renderReviews(rows) {
+  const c = document.getElementById('rv-list');
+  if (!rows.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div><h3>لا توجد تقييمات</h3><p>أضف رابط Google ثم اضغط تحديث</p></div>'; return; }
+  c.innerHTML = rows.map((r,i)=>rvCard(r,i)).join('');
+}
+
+function rvCard(r,i) {
+  const st = Math.min(5,Math.max(1,Number(r.stars)||3));
+  const badge = r.replied ? '<span class="badge b-ok">✓ تم الرد</span>' : st<=2 ? '<span class="badge b-bad">⚠ سلبي</span>' : '<span class="badge b-wait">⏳ لم يُرد</span>';
+  return `<div class="rv" data-replied="${r.replied?1:0}" data-stars="${st}" id="rv${r.id||i}">
+    <div class="rv-top"><div><div class="rv-name">${r.author_name||'مجهول'}</div><div class="stars">${'★'.repeat(st)}${'☆'.repeat(5-st)}</div><div class="rv-date">${r.review_date||''}</div></div>${badge}</div>
+    <div class="rv-text">${r.review_text||'(بدون تعليق)'}</div>
+    ${!r.replied?`<button class="btn bp" style="font-size:11px;padding:6px 12px;" onclick="aiReply(this,'${(r.author_name||'').replace(/'/g,"\\'")}',${st},\`${(r.review_text||'').replace(/`/g,'\\`').replace(/\n/g,' ')}\`)">🤖 ولّد رد بالذكاء الاصطناعي</button>`:''}
+  </div>`;
+}
+
+function renderRecent(rows) {
+  const c = document.getElementById('recent-list');
+  if (!rows.length) { c.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div><h3>لا توجد تقييمات بعد</h3><p>اضغط تحديث لجلب تقييماتك</p></div>'; return; }
+  c.innerHTML = rows.map(r=>`<div style="border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:8px;font-size:12px;"><strong>${r.author_name||'مجهول'}</strong> <span style="color:var(--gold2)">${'★'.repeat(Math.min(5,r.stars||0))}</span><div style="color:var(--muted);margin-top:4px;line-height:1.5">${(r.review_text||'').substring(0,100)}${(r.review_text||'').length>100?'…':''}</div></div>`).join('');
+}
+
+function filterRv(type, el) {
+  document.querySelectorAll('#s-reviews .btn').forEach(b=>b.classList.remove('bp'));
+  el.classList.add('bp');
+  document.querySelectorAll('#rv-list .rv').forEach(rv=>{
+    const rep=rv.dataset.replied==='1', st=+rv.dataset.stars;
+    rv.style.display=(type==='all'||
+      (type==='pending'&&!rep)||(type==='replied'&&rep)||(type==='bad'&&st<=2))?'':'none';
+  });
+}
+
+async function fetchReviews() {
+  if (!profile?.google_place_id) { FIVE.toast('أضف رابط Google Business أولاً','error'); return; }
+  const btn = document.querySelector('[onclick="fetchReviews()"]');
+  btn.disabled=true; btn.textContent='⏳...';
+  const r = await FIVE.callEdge('get-reviews',{mapsUrl:profile.google_place_id});
+  btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-rotate"></i>تحديث من Google';
+  if (!r.success) { FIVE.toast('❌ '+(r.error||'فشل الجلب'),'error'); return; }
+  await syncReviews(r);
+  FIVE.toast(`✅ تم جلب ${r.reviews?.length||0} تقييم`);
+}
+
+async function syncReviews(data) {
+  await sb.from('reviews').delete().eq('user_id',user.id).eq('source','google');
+  if (data.reviews?.length) {
+    await sb.from('reviews').insert(data.reviews.map(rv=>({
+      user_id:user.id, author_name:rv.author, review_text:rv.text,
+      stars:Math.min(5,Math.max(1,rv.stars||3)), review_date:rv.date?.slice(0,10)||null,
+      replied:false, source:'google'
+    })));
+  }
+  await sb.from('business_info').upsert({user_id:user.id,avg_rating:data.rating,total_review_count:data.total,google_review_url:profile.google_place_id,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  await loadData();
+}
+
+async function aiReply(btn, name, stars, text) {
+  btn.disabled=true; btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التوليد...';
+  const r = await FIVE.callEdge('ai-reply',{
+    businessName:profile?.full_name||'محلك',
+    businessType:profile?.business_type||'restaurant',
+    rating:stars, reviewText:text, dialect:'saudi'
+  });
+  btn.disabled=false;
+  if (!r.reply) { btn.innerHTML='🤖 ولّد رد'; FIVE.toast('فشل التوليد','error'); return; }
+  const item = btn.closest('.rv');
+  btn.remove();
+  const d = document.createElement('div');
+  d.style.marginTop='10px';
+  d.innerHTML = `<div style="background:var(--blue-l);border-right:3px solid var(--blue);border-radius:9px;padding:11px;font-size:12px;margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:4px;">اقتراح الذكاء الاصطناعي ✨</div><div contenteditable="true" style="outline:none;min-height:32px;line-height:1.7">${r.reply}</div></div><div style="display:flex;gap:6px;"><button class="btn bp" style="font-size:11px;padding:5px 12px;" onclick="waReply(this,'${name}')">📱 واتساب</button><button class="btn bo" style="font-size:11px;padding:5px 12px;" onclick="aiReply(this,'${name}',${stars},\`${text}\`)">🔄 إعادة</button></div>`;
+  item.appendChild(d);
+  FIVE.toast('✅ تم توليد الرد!');
+}
+
+async function waReply(btn, name) {
+  const text = btn.closest('div').previousElementSibling.querySelector('[contenteditable]')?.textContent?.trim();
+  if (!text) { FIVE.toast('الرد فارغ','error'); return; }
+  const phone = profile?.phone;
+  if (!phone) { FIVE.toast('أضف رقم واتساب في الإعدادات','error'); return; }
+  btn.disabled=true; btn.textContent='⏳...';
+  const r = await FIVE.callEdge('send-whatsapp',{type:'reply',phone,variables:[name,profile?.full_name||'محلك',text]});
+  if (r.success) { FIVE.toast('✅ تم الإرسال!'); btn.textContent='✅ أُرسل'; }
+  else { FIVE.toast('❌ '+(r.error||'فشل'),'error'); btn.disabled=false; btn.textContent='📱 واتساب'; }
+}
+
+// QR
+let _qrObj = null;
+function genQR() {
+  const link = document.getElementById('qr-link')?.value?.trim() || (window.location.origin+'/review.html?uid='+(user?.id||''));
+  const el = document.getElementById('qrcode');
+  el.innerHTML = '';
+  try {
+    _qrObj = new QRCode(el,{text:link,width:160,height:160,colorDark:'#0B1F4E',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+    document.getElementById('qr-url').textContent = link.length>50 ? link.substring(0,50)+'...' : link;
+  } catch(e){}
+}
+function dlQR() {
+  const c = document.querySelector('#qrcode canvas');
+  if (!c) return;
+  const a = document.createElement('a'); a.download='5tars-qr.png'; a.href=c.toDataURL(); a.click();
+}
+
+// Google modal
+function openGoogleModal() {
+  const m = document.getElementById('g-modal');
+  m.style.display = 'flex';
+  document.getElementById('g-link').value = profile?.google_place_id || '';
+  document.getElementById('g-err').style.display = 'none';
+}
+async function saveGoogleLink() {
+  const link = document.getElementById('g-link').value.trim();
+  const errEl = document.getElementById('g-err');
+  const btn   = document.getElementById('g-save-btn');
+  errEl.style.display = 'none';
+  if (!link) { errEl.textContent='أدخل الرابط'; errEl.style.display='block'; return; }
+  if (!link.includes('google') && !link.includes('goo.gl') && !link.includes('maps')) {
+    errEl.textContent='الرابط يبدو غير صحيح — انسخه من Google Maps';
+    errEl.style.display='block'; return;
+  }
+  btn.disabled=true; btn.textContent='⏳ حفظ...';
+  const {error} = await sb.from('profiles').update({google_place_id:link,google_connected:true}).eq('id',user.id);
+  btn.disabled=false; btn.textContent='حفظ الرابط';
+  if (error) { errEl.textContent='فشل الحفظ: '+error.message; errEl.style.display='block'; return; }
+  profile.google_place_id = link; profile.google_connected = true;
+  document.getElementById('cbanner').style.display = 'none';
+  document.getElementById('g-modal').style.display = 'none';
+  document.getElementById('qr-link').value = link;
+  document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div>`;
+  genQR();
+  FIVE.toast('✅ تم حفظ رابط Google!');
+}
+
+// Filter demo
+function fdemo(t) {
+  const el = document.getElementById('fdemo-res');
+  el.style.display = 'block';
+  if (t==='h') { el.innerHTML='🎉 <strong>يتم توجيهه لـ Google لكتابة تقييم!</strong>'; el.style.background='#F0FDF4'; el.style.color='#15803D'; }
+  else { el.innerHTML='💬 <strong>يُوجَّه لرسالتك الخاصة!</strong><br>بدل ما يكتب تقييم سلبي على Google ✅'; el.style.background='#FEF3C7'; el.style.color='#92400E'; }
+}
+
+// Settings
+async function saveSettings() {
+  const {error} = await sb.from('profiles').update({
+    full_name: document.getElementById('s-name').value,
+    phone: document.getElementById('s-phone').value,
+    business_type: document.getElementById('s-btype').value
+  }).eq('id',user.id);
+  if (!error) { FIVE.toast('✅ تم الحفظ!'); document.getElementById('uname').textContent = document.getElementById('s-name').value; }
+  else FIVE.toast('❌ فشل الحفظ','error');
+}
+
+async function saveFilter() {
+  await sb.from('site_settings').upsert([
+    {key:'neg_message',value:document.getElementById('neg-msg').value},
+    {key:'neg_whatsapp',value:document.getElementById('neg-wa').value}
+  ],{onConflict:'key'});
+  FIVE.toast('✅ تم حفظ إعدادات الفلتر!');
+}
+
+// Review request
+async function sendRequest() {
+  const name  = document.getElementById('rq-name').value.trim();
+  let phone   = document.getElementById('rq-phone').value.trim().replace(/[\s\-\(\)+]/g,'');
+  const svc   = document.getElementById('rq-service').value.trim();
+  const glink = document.getElementById('rq-glink').value.trim() || profile?.google_place_id || '';
+  if (!name||!phone) { FIVE.toast('أدخل الاسم والرقم','error'); return; }
+  if (phone.startsWith('05')&&phone.length===10) phone='966'+phone.slice(1);
+  else if (phone.startsWith('5')&&phone.length===9) phone='966'+phone;
+  await sb.from('review_requests').insert({owner_id:user.id,customer_name:name,customer_phone:phone,service_type:svc,google_link:glink});
+  const r = await FIVE.callEdge('send-whatsapp',{type:'review_request',phone,variables:[name,profile?.full_name||'محلك',glink]});
+  if (r.success||r.messageId) {
+    FIVE.toast('✅ تم إرسال طلب التقييم!');
+    const list = document.getElementById('rq-list');
+    if (list.querySelector('.empty')) list.innerHTML='';
+    const item=document.createElement('div');
+    item.style.cssText='border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;font-size:12px;';
+    item.innerHTML=`<div><strong>${name}</strong><div style="color:var(--muted);font-size:11px">${phone}${svc?' · '+svc:''}</div></div><span class="badge b-wait">⏳ مُرسل</span>`;
+    list.insertBefore(item,list.firstChild);
+    ['rq-name','rq-phone','rq-service'].forEach(id=>document.getElementById(id).value='');
+  } else FIVE.toast('❌ فشل الإرسال — تحقق من إعدادات واتساب','error');
+}
+
+// Smart suggestions
+function buildSuggestions() {
+  const p = profile||{};
+  const cards=[];
+  if (!p.google_connected) cards.push({pr:'hp',ic:'ic-r',ico:'🔗',t:'ربط Google Business — الخطوة الأولى',d:'بدون الربط لا يمكن مراقبة التقييمات أو الرد عليها. يأخذ أقل من دقيقة.',a:'اربط الآن',fn:"show('settings',document.querySelector('.ni:nth-child(7)'));openGoogleModal()"});
+  if (p.google_connected) cards.push({pr:'mp',ic:'ic-g',ico:'📱',t:'فعّل QR Code في مشروعك',d:'ضع الباركود على الطاولة أو الفاتورة — يضاعف عدد التقييمات 3 أضعاف.',a:'انشئ QR Code',fn:"show('qr',document.querySelector('.ni:nth-child(4)'));genQR()"});
+  if (!cards.length) cards.push({pr:'lp',ic:'ic-gr',ico:'✅',t:'حسابك جاهز — ابدأ الاستخدام!',d:'كل شيء مضبوط. الآن استخدم QR Code وطلبات التقييم لجمع أكبر عدد من التقييمات.',a:null});
+  document.getElementById('sugg-list').innerHTML = cards.map(c=>`<div class="sugg ${c.pr}"><div class="sugg-icon ${c.ic}">${c.ico}</div><div style="flex:1"><div class="sugg-t">${c.t}</div><div class="sugg-d">${c.d}</div>${c.a?`<button class="sugg-a" onclick="${c.fn}">← ${c.a}</button>`:''}</div></div>`).join('');
+}
+
+// Navigation
+function show(name, el) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const sec=document.getElementById('s-'+name);
+  if(sec) sec.classList.add('on');
+  const btn=el&&el.classList?el:null;
+  if(btn) btn.classList.add('on');
+}
+
+// Close modal on outside click
+document.getElementById('g-modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
+
+init();
+</script>
+</body>
+</html>
