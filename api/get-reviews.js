@@ -1,54 +1,103 @@
 export const config = { runtime: 'edge' };
 
+const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyBcTfCWAcgcfhf3y9_bYxRaBXjEJYDcrI8';
+
+async function findPlaceId(query) {
+  const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id,name,rating&key=${GOOGLE_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status === 'OK' && data.candidates?.length > 0) {
+    return data.candidates[0].place_id;
+  }
+  return null;
+}
+
+async function getPlaceDetails(placeId) {
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews&language=ar&reviews_sort=newest&key=${GOOGLE_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.status === 'OK') return data.result;
+  return null;
+}
+
+function extractPlaceId(mapsUrl) {
+  // أنماط مختلفة لـ place_id في روابط Google Maps
+  const patterns = [
+    /[?&]place_id=([^&]+)/,           // ?place_id=ChIJ...
+    /!1s(ChIJ[^!]+)!/,                // !1sChIJ...!
+    /maps\/place\/[^/]+\/([^/]*ChIJ[^/]*)/,  // /place/name/ChIJ...
+    /0x[0-9a-f]+:0x[0-9a-f]+/,       // hex format
+  ];
+  for (const p of patterns) {
+    const m = mapsUrl.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
 export default async function handler(req) {
-  const headers = {'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'POST,OPTIONS'};
-  if (req.method==='OPTIONS') return new Response('ok',{headers});
-  if (req.method!=='POST') return new Response('Method not allowed',{status:405});
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+  };
+  if (req.method === 'OPTIONS') return new Response('ok', { headers });
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+
   try {
-    const {mapsUrl} = await req.json();
-    if (!mapsUrl) return new Response(JSON.stringify({success:false,error:'mapsUrl required'}),{status:400,headers});
-    const PLACES_KEY = process.env.GOOGLE_PLACES_API_KEY || 'AIzaSyBcTfCWAcgcfhf3y9_bYxRaBXjEJYDcrI8';
+    const { mapsUrl } = await req.json();
+    if (!mapsUrl) return new Response(JSON.stringify({ success: false, error: 'mapsUrl required' }), { status: 400, headers });
 
-    // Extract place ID
-    let placeId = null;
-    const patterns = [/place_id=([^&]+)/,/!1s([^!]+)!/,/\/maps\/place\/[^/]+\/@[^/]+\/([A-Za-z0-9_-]{20,})/];
-    for (const p of patterns) { const m=mapsUrl.match(p); if(m){placeId=m[1];break;} }
+    // 1. حاول استخراج place_id من الرابط
+    let placeId = extractPlaceId(mapsUrl);
 
-    // If short URL or no place_id, try text search
+    // 2. إذا فشل، استخدم النص كـ query
     if (!placeId) {
-      const searchRes = await fetch('https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input='+encodeURIComponent(mapsUrl)+'&inputtype=textquery&fields=place_id&key='+PLACES_KEY);
-      if (searchRes.ok) {
-        const sd = await searchRes.json();
-        placeId = sd.candidates?.[0]?.place_id;
-      }
+      placeId = await findPlaceId(mapsUrl);
     }
 
-    if (!placeId) {
-      // Return demo if can't find place
-      return new Response(JSON.stringify({success:true,rating:4.3,total:47,placeId:'demo',reviews:[
-        {author:'محمد العتيبي',stars:5,text:'خدمة ممتازة جداً!',date:'2026-04-05',avatar:null},
-        {author:'نورة الشمري',stars:5,text:'تجربة رائعة',date:'2026-04-04',avatar:null},
-        {author:'سارة المطيري',stars:3,text:'الانتظار طويل',date:'2026-04-03',avatar:null},
-        {author:'خالد الزهراني',stars:1,text:'سيئ جداً',date:'2026-04-02',avatar:null},
-        {author:'فاطمة القحطاني',stars:5,text:'ممتاز كالعادة',date:'2026-04-01',avatar:null},
-      ],note:'demo_mode'}),{headers});
+    // 3. إذا فشل كل شيء، ابحث بالـ URL كنص
+    if (!placeId && mapsUrl.includes('maps.google')) {
+      const urlObj = new URL(mapsUrl);
+      const q = urlObj.searchParams.get('q') || urlObj.searchParams.get('query');
+      if (q) placeId = await findPlaceId(q);
     }
 
-    const detailsRes = await fetch('https://maps.googleapis.com/maps/api/place/details/json?place_id='+placeId+'&fields=name,rating,user_ratings_total,reviews&language=ar&reviews_sort=newest&key='+PLACES_KEY);
-    if (!detailsRes.ok) throw new Error('Google API error');
-    const details = await detailsRes.json();
-    if (details.status !== 'OK') throw new Error('Google: '+details.status);
-    const r = details.result||{};
+    // 4. fallback: demo data
+    if (!placeId) {
+      return new Response(JSON.stringify({
+        success: true, rating: 4.3, total: 47, placeId: 'demo',
+        reviews: [
+          { author: 'محمد العتيبي', stars: 5, text: 'خدمة ممتازة جداً!', date: '2026-04-05' },
+          { author: 'نورة الشمري', stars: 5, text: 'تجربة رائعة', date: '2026-04-04' },
+          { author: 'سارة المطيري', stars: 3, text: 'الانتظار طويل لكن الخدمة كويسة', date: '2026-04-03' },
+          { author: 'خالد الزهراني', stars: 1, text: 'سيئ! الطلب وصل متأخر', date: '2026-04-02' },
+          { author: 'فاطمة القحطاني', stars: 5, text: 'ممتاز كالعادة', date: '2026-04-01' },
+        ],
+        note: 'demo_mode'
+      }), { headers });
+    }
+
+    // 5. جلب التفاصيل الحقيقية
+    const details = await getPlaceDetails(placeId);
+    if (!details) throw new Error('Could not get place details');
+
     return new Response(JSON.stringify({
-      success:true,placeId,
-      rating:r.rating||0,total:r.user_ratings_total||0,
-      reviews:(r.reviews||[]).map(rv=>({
-        author:rv.author_name,stars:rv.rating,text:rv.text,
-        date:new Date(rv.time*1000).toISOString().slice(0,10),
-        avatar:rv.profile_photo_url||null
+      success: true,
+      placeId,
+      rating: details.rating || 0,
+      total: details.user_ratings_total || 0,
+      name: details.name,
+      reviews: (details.reviews || []).map(r => ({
+        author: r.author_name,
+        stars: r.rating,
+        text: r.text,
+        date: new Date(r.time * 1000).toISOString().slice(0, 10),
+        avatar: r.profile_photo_url || null
       }))
-    }),{headers});
-  } catch(e) {
-    return new Response(JSON.stringify({success:false,error:e.message}),{status:500,headers});
+    }), { headers });
+
+  } catch (e) {
+    return new Response(JSON.stringify({ success: false, error: e.message }), { status: 500, headers });
   }
 }
