@@ -1,0 +1,6 @@
+.env
+.env.local
+.env.production
+*.secret
+node_modules/
+.vercel/
