@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Code — طباعة</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:#F0F4FF;direction:rtl;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+
+/* بطاقة الطباعة */
+.card{background:#fff;border-radius:24px;padding:36px 32px;width:340px;text-align:center;box-shadow:0 20px 60px rgba(11,31,78,.15);border:2px solid rgba(34,81,211,.08);}
+.logo{font-family:'Tajawal',sans-serif;font-size:32px;font-weight:900;direction:ltr;margin-bottom:4px;}
+.l5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
+.lt{color:#0B1F4E;}
+.biz-name{font-size:18px;font-weight:900;color:#0B1F4E;margin:12px 0 4px;}
+.tagline{font-size:12px;color:#64748B;margin-bottom:20px;}
+.qr-wrap{background:#F8FAFF;border:2px solid rgba(34,81,211,.1);border-radius:16px;padding:20px;margin-bottom:20px;display:inline-block;}
+.stars{font-size:28px;letter-spacing:2px;margin-bottom:12px;}
+.cta{font-family:'Tajawal',sans-serif;font-size:17px;font-weight:900;color:#0B1F4E;margin-bottom:6px;}
+.sub{font-size:12px;color:#64748B;line-height:1.6;}
+.emojis{font-size:22px;margin-top:10px;letter-spacing:4px;}
+.divider{height:1px;background:rgba(34,81,211,.08);margin:18px 0;}
+.url-text{font-size:10px;color:#94A3B8;word-break:break-all;direction:ltr;text-align:center;}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#EEF3FF;color:#2251D3;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-top:12px;}
+
+/* أزرار الصفحة (لا تُطبع) */
+.actions{display:flex;gap:10px;margin-top:24px;justify-content:center;}
+.btn{padding:11px 20px;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
+.btn-print{background:linear-gradient(135deg,#0B1F4E,#2251D3);color:#fff;}
+.btn-dl{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;}
+.btn:hover{transform:translateY(-1px);}
+.loading{padding:20px;color:#64748B;font-size:14px;}
+
+@media print {
+  body{background:#fff;padding:0;display:block;}
+  .actions,.no-print{display:none!important;}
+  .card{box-shadow:none;border:none;margin:0 auto;}
+  @page{margin:0;size:A5 portrait;}
+}
+</style>
+</head>
+<body>
+<div>
+  <div class="card" id="qr-card">
+    <div class="loading" id="loading">⏳ جاري التحميل...</div>
+
+    <div id="content" style="display:none">
+      <div class="logo"><span class="l5">5</span><span class="lt">tars</span></div>
+      <div class="biz-name" id="biz-name">محلك</div>
+      <div class="tagline" id="tagline">نسعد بخدمتك</div>
+
+      <div class="qr-wrap">
+        <div id="qrcode"></div>
+      </div>
+
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <div class="cta">قيّم تجربتك معنا</div>
+      <div class="sub">امسح الباركود بكاميرا هاتفك<br>ويأخذك مباشرة لصفحة التقييم</div>
+      <div class="emojis">😊 &nbsp; 😞</div>
+
+      <div class="divider"></div>
+      <div class="url-text" id="url-text"></div>
+      <div class="badge">⚡ مدعوم من 5tars</div>
+    </div>
+  </div>
+
+  <div class="actions no-print">
+    <button class="btn btn-print" onclick="window.print()">🖨️ طباعة</button>
+    <button class="btn btn-dl" onclick="downloadQR()">⬇️ تحميل PNG</button>
+    <button class="btn" style="background:#F1F5F9;color:#475569" onclick="history.back()">← رجوع</button>
+  </div>
+</div>
+
+<script>
+var SB_URL = 'https://bxlvcdfqpkxyrqjdnchi.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U';
+var sb = supabase.createClient(SB_URL, SB_KEY);
+
+async function init() {
+  var params = new URLSearchParams(window.location.search);
+  var uid = params.get('uid');
+
+  if (!uid) {
+    // محاولة جلب من session
+    var sess = await sb.auth.getSession();
+    if (sess.data && sess.data.session) {
+      uid = sess.data.session.user.id;
+    }
+  }
+
+  var reviewUrl = window.location.origin + '/review.html?uid=' + (uid || '');
+  var bizName = 'محلك';
+
+  if (uid) {
+    var r1 = await sb.from('business_info').select('display_name').eq('user_id', uid).maybeSingle();
+    var r2 = await sb.from('profiles').select('full_name').eq('id', uid).maybeSingle();
+    bizName = (r1.data && r1.data.display_name) || (r2.data && r2.data.full_name) || 'محلك';
+  }
+
+  document.getElementById('biz-name').textContent = bizName;
+  document.getElementById('tagline').textContent = 'نسعد بخدمتك في ' + bizName;
+  document.getElementById('url-text').textContent = reviewUrl;
+  document.title = 'QR Code — ' + bizName;
+
+  new QRCode(document.getElementById('qrcode'), {
+    text: reviewUrl,
+    width: 200,
+    height: 200,
+    colorDark: '#0B1F4E',
+    colorLight: '#F8FAFF',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}
+
+function downloadQR() {
+  var canvas = document.querySelector('#qrcode canvas');
+  if (!canvas) { alert('جاري التحميل...'); return; }
+  var a = document.createElement('a');
+  a.download = '5tars-qr.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+init();
+</script>
+</body>
+</html>
