@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>5tars — إنشاء حساب مجاني</title>
+<title>5tars — إنشاء حساب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px;}
@@ -16,7 +17,7 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%
 .badge{display:inline-flex;align-items:center;gap:6px;background:#EEF3FF;color:#2251D3;border:1px solid rgba(34,81,211,.2);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
 h2{font-size:19px;font-weight:900;color:#0B1F4E;text-align:center;margin-bottom:20px;}
 .benefits{background:#F0FDF4;border:1px solid rgba(22,163,74,.15);border-radius:10px;padding:12px 16px;margin-bottom:18px;}
-.ben{font-size:12px;color:#166534;margin-bottom:4px;}
+.ben{font-size:12px;color:#166534;margin-bottom:5px;}
 .ben:last-child{margin-bottom:0;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .field{margin-bottom:13px;}
@@ -46,13 +47,13 @@ input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,21
   </div>
   <div class="err" id="err"></div>
   <div class="grid2">
-    <div class="field"><label>الاسم الكامل</label><input type="text" id="name" placeholder="محمد العمري" autocomplete="name"></div>
+    <div class="field"><label>الاسم الكامل</label><input type="text" id="name" placeholder="محمد العمري"></div>
     <div class="field"><label>رقم الواتساب</label><input type="tel" id="phone" placeholder="05xxxxxxxx"></div>
   </div>
-  <div class="field"><label>البريد الإلكتروني</label><input type="email" id="email" placeholder="you@example.com" autocomplete="email"></div>
-  <div class="field"><label>كلمة المرور</label><input type="password" id="pass" placeholder="8 أحرف على الأقل" autocomplete="new-password"></div>
+  <div class="field"><label>البريد الإلكتروني</label><input type="email" id="email" placeholder="you@example.com"></div>
+  <div class="field"><label>كلمة المرور</label><input type="password" id="pass" placeholder="8 أحرف على الأقل"></div>
   <div class="field">
-    <label>نوع النشاط التجاري</label>
+    <label>نوع النشاط</label>
     <select id="btype">
       <option value="">اختر...</option>
       <option value="restaurant">مطعم</option>
@@ -68,66 +69,43 @@ input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,21
   <button class="btn" id="btn" onclick="doSignup()">ابدأ تجربتي المجانية ←</button>
   <div class="link">عندك حساب؟ <a href="/login.html">سجّل دخول</a></div>
 </div>
-
 <script>
-const SB_URL = 'https://bxlvcdfqpkxyrqjdnchi.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U';
-
-const s = document.createElement('script');
-s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-s.onload = () => {
-  window._sb = supabase.createClient(SB_URL, SB_KEY);
-  window._sb.auth.getSession().then(({data}) => {
-    if (data?.session) window.location.href = '/dashboard.html';
-  });
-};
-document.head.appendChild(s);
+const sb = supabase.createClient('https://bxlvcdfqpkxyrqjdnchi.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U');
+sb.auth.getSession().then(function(r) {
+  if (r.data && r.data.session) window.location.href = '/dashboard.html';
+});
 
 async function doSignup() {
-  const name  = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const pass  = document.getElementById('pass').value;
-  const btype = document.getElementById('btype').value;
-  const err   = document.getElementById('err');
-  const btn   = document.getElementById('btn');
+  var name  = document.getElementById('name').value.trim();
+  var phone = document.getElementById('phone').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var pass  = document.getElementById('pass').value;
+  var btype = document.getElementById('btype').value;
+  var err   = document.getElementById('err');
+  var btn   = document.getElementById('btn');
   err.className = 'err';
-
   if (!name||!email||!pass) { err.textContent='الاسم والإيميل وكلمة المرور مطلوبة'; err.className='err show'; return; }
   if (pass.length<8) { err.textContent='كلمة المرور 8 أحرف على الأقل'; err.className='err show'; return; }
-  if (!window._sb) { err.textContent='جاري التحميل، أعد المحاولة'; err.className='err show'; return; }
-
   btn.disabled=true;
   btn.innerHTML='جاري التسجيل... <span class="spinner"></span>';
-
-  const {data, error} = await window._sb.auth.signUp({
-    email, password: pass,
-    options: { data: { full_name: name, phone, business_type: btype } }
+  var result = await sb.auth.signUp({
+    email: email, password: pass,
+    options: { data: { full_name: name, phone: phone, business_type: btype } }
   });
-
-  if (error) {
-    const msgs = {
-      'User already registered': 'هذا الإيميل مسجّل — <a href="/login.html">سجّل دخول</a>',
-      'Password should be at least 6 characters': 'كلمة المرور 8 أحرف على الأقل'
-    };
-    err.innerHTML = msgs[error.message]||error.message;
+  if (result.error) {
+    var msgs = {'User already registered':'هذا الإيميل مسجّل — <a href="/login.html">سجّل دخول</a>'};
+    err.innerHTML = msgs[result.error.message]||result.error.message;
     err.className='err show';
     btn.disabled=false;
-    btn.innerHTML='ابدأ تجربتي المجانية ←';
+    btn.textContent='ابدأ تجربتي المجانية ←';
     return;
   }
-
-  if (data.user) {
-    // Auto-confirm + create profile
-    await fetch('/api/signup-confirm', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        userId: data.user.id, email, full_name: name, phone, business_type: btype
-      })
+  if (result.data && result.data.user) {
+    fetch('/api/signup-confirm', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ userId:result.data.user.id, email:email, full_name:name, phone:phone, business_type:btype })
     });
   }
-
   window.location.href = '/dashboard.html';
 }
 </script>
