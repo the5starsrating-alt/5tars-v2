@@ -266,6 +266,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
         <div style="font-size:10px;color:var(--muted);word-break:break-all;" id="qr-url"></div>
         <div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;">
           <button class="btn bp" onclick="dlQR()">⬇️ تحميل</button>
+          <button class="btn bp" style="margin-top:6px;background:linear-gradient(135deg,#0B1F4E,#2251D3);color:#fff" onclick="window.open('/qr-print.html?uid='+(user?.id||''),'_blank')">🖨️ طباعة</button>
           <button class="btn bo" onclick="window.print()">🖨️ طباعة</button>
         </div>
       </div>
