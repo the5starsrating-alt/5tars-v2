@@ -32,7 +32,7 @@ export default async function handler(req) {
         'metadata[plan]':plan,
         'success_url':origin+'/dashboard.html?payment=success&plan='+plan,
         'cancel_url':origin+'/signup.html?cancelled=true',
-        'locale':'ar'
+        'locale':'auto'
       })
     });
     const session = await res.json();
