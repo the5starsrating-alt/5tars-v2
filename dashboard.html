@@ -703,7 +703,10 @@ async function fetchReviews() {
   if (!profile?.google_place_id) { FIVE.toast('أضف رابط Google Business أولاً','error'); return; }
   const btn = document.querySelector('[onclick="fetchReviews()"]');
   btn.disabled=true; btn.textContent='⏳...';
-  const r = await FIVE.callEdge('get-reviews',{mapsUrl:profile.google_place_id});
+  const r = await FIVE.callEdge('get-reviews',{
+    mapsUrl: profile.google_place_id,
+    query: profile.full_name || ''
+  });
   btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-rotate"></i>تحديث من Google';
   if (!r.success) { FIVE.toast('❌ '+(r.error||'فشل الجلب'),'error'); return; }
   await syncReviews(r);
