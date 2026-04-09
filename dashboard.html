@@ -714,15 +714,48 @@ async function fetchReviews() {
 }
 
 async function syncReviews(data) {
-  await sb.from('reviews').delete().eq('user_id',user.id).eq('source','google');
   if (data.reviews?.length) {
-    await sb.from('reviews').insert(data.reviews.map(rv=>({
-      user_id:user.id, author_name:rv.author, review_text:rv.text,
-      stars:Math.min(5,Math.max(1,rv.stars||3)), review_date:rv.date?.slice(0,10)||null,
-      replied:false, source:'google'
-    })));
+    // upsert by fingerprint — no delete, preserves replied status and manual edits
+    const rows = data.reviews.map(rv => {
+      const fp = btoa(unescape(encodeURIComponent(
+        (rv.author || '') + '|' + (rv.date || '') + '|' + (rv.stars || 0)
+      ))).slice(0, 40);
+      return {
+        user_id: user.id,
+        author_name: rv.author,
+        review_text: rv.text,
+        stars: Math.min(5, Math.max(1, rv.stars || 3)),
+        review_date: rv.date?.slice(0, 10) || null,
+        source: 'google',
+        fingerprint: fp
+      };
+    });
+
+    const { data: upserted } = await sb.from('reviews')
+      .upsert(rows, { onConflict: 'user_id,fingerprint', ignoreDuplicates: false })
+      .select('id,stars,review_text,tags');
+
+    // Auto-tag reviews that have no tags yet (fire and forget)
+    if (upserted?.length) {
+      const untagged = upserted.filter(r => !r.tags?.length);
+      for (const rv of untagged.slice(0, 5)) { // max 5 per sync to save tokens
+        fetch('/api/tag-review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reviewId: rv.id, stars: rv.stars, text: rv.review_text, userId: user.id })
+        }).catch(() => {});
+      }
+    }
   }
-  await sb.from('business_info').upsert({user_id:user.id,avg_rating:data.rating,total_review_count:data.total,google_review_url:profile.google_place_id,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+
+  await sb.from('business_info').upsert({
+    user_id: user.id,
+    avg_rating: data.rating,
+    total_review_count: data.total,
+    google_review_url: profile.google_place_id,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' });
+
   await loadData();
 }
 
