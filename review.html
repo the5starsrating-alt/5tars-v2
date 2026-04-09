@@ -30,11 +30,10 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(160deg,#0B1F4E 0%
 .r-btn{display:block;width:100%;padding:17px;border-radius:16px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:900;text-decoration:none;transition:all .2s;margin-bottom:12px;}
 .r-btn.google{background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E;box-shadow:0 8px 28px rgba(212,146,10,.4);}
 .r-btn.wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 8px 28px rgba(37,211,102,.35);}
-.r-btn:active{transform:scale(0.98);}
 .spin-wrap{padding:30px;}
 .spin{display:inline-block;width:28px;height:28px;border:3px solid rgba(11,31,78,.1);border-top-color:#2251D3;border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
-.err-msg{color:#DC2626;font-size:13px;background:#FEF2F2;border-radius:12px;padding:20px;}
+.err-msg{color:#DC2626;font-size:13px;background:#FEF2F2;border-radius:12px;padding:20px;line-height:1.8;}
 </style>
 </head>
 <body>
@@ -58,14 +57,14 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(160deg,#0B1F4E 0%
     <div class="r-icon">🌟</div>
     <div class="r-title">رائع! يسعدنا سماع ذلك</div>
     <div class="r-sub">تقييمك على Google يساعد الجميع ويشجّعنا على الاستمرار 🙏</div>
-    <a id="google-link" href="#" class="r-btn google" target="_blank">⭐ اكتب تقييمك على Google الآن</a>
+    <a id="google-link" href="#" class="r-btn google" target="_blank" rel="noopener">⭐ اكتب تقييمك على Google الآن</a>
   </div>
 
   <div id="s-sad" class="result">
     <div class="r-icon">💙</div>
     <div class="r-title">نأسف لذلك!</div>
-    <div class="r-sub">آسفون على تجربتك! تواصل معنا مباشرة وسنعوضك فوراً 💚</div>
-    <a id="wa-link" href="#" class="r-btn wa" target="_blank">📱 تواصل معنا على واتساب</a>
+    <div class="r-sub" id="neg-msg">آسفون على تجربتك! تواصل معنا مباشرة وسنعوضك فوراً 💚</div>
+    <a id="wa-link" href="#" class="r-btn wa" target="_blank" rel="noopener">📱 تواصل معنا على واتساب</a>
   </div>
 </div>
 
@@ -73,7 +72,8 @@ body{font-family:'Cairo',sans-serif;background:linear-gradient(160deg,#0B1F4E 0%
 var SB_URL = 'https://bxlvcdfqpkxyrqjdnchi.supabase.co';
 var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U';
 var sb = supabase.createClient(SB_URL, SB_KEY);
-var _uid, _googleUrl, _ownerPhone;
+var _route = null;
+var _legacyUid = null;
 
 function show(id) {
   ['s-load','s-err','s-survey','s-happy','s-sad'].forEach(function(x){
@@ -81,62 +81,93 @@ function show(id) {
   });
 }
 
-async function init() {
+function normalizeWhatsappUrl(raw) {
+  var digits = String(raw || '').replace(/\D/g,'');
+  if (!digits) return '';
+  if (digits.startsWith('966')) return 'https://wa.me/' + digits;
+  if (digits.startsWith('05') && digits.length === 10) return 'https://wa.me/966' + digits.slice(1);
+  if (digits.startsWith('5') && digits.length === 9) return 'https://wa.me/966' + digits;
+  return 'https://wa.me/' + digits;
+}
+
+async function loadRoute() {
   var params = new URLSearchParams(window.location.search);
-  _uid = params.get('uid') || params.get('bid');
-  if (!_uid) { show('s-err'); return; }
+  var token = params.get('t');
+  _legacyUid = params.get('uid') || params.get('bid');
+
   try {
-    var r1 = await sb.from('business_info').select('display_name,google_review_url').eq('user_id',_uid).maybeSingle();
-    var r2 = await sb.from('profiles').select('full_name,phone,status').eq('id',_uid).maybeSingle();
-    var bi = (r1.data) || {};
-    var pr = (r2.data) || {};
-    if (pr.status === 'suspended') { document.getElementById('s-err').textContent='⏸️ هذا الحساب موقوف.'; show('s-err'); return; }
-    var bizName = bi.display_name || pr.full_name || 'محلك';
-    document.getElementById('biz-name').textContent = bizName;
-    document.getElementById('biz-sub').textContent = 'نسعد بخدمتك في ' + bizName;
-    document.title = 'قيّم ' + bizName;
-    _googleUrl = bi.google_review_url || '';
-    document.getElementById('google-link').href = _googleUrl || 'https://maps.google.com';
-    if (pr.phone) {
-      var p = pr.phone.replace(/\D/g,'');
-      if (p.startsWith('05')&&p.length===10) p='966'+p.slice(1);
-      else if (p.startsWith('5')&&p.length===9) p='966'+p;
-      _ownerPhone = p;
-      document.getElementById('wa-link').href = 'https://wa.me/'+p+'?text='+encodeURIComponent('مرحباً، لدي ملاحظة على خدمة '+bizName);
-    }
-    show('s-survey');
-  } catch(e) { show('s-err'); }
+    var query = sb.from('review_links').select('token,user_id,business_name,google_review_url,whatsapp_url,negative_message,active');
+    if (token) query = query.eq('token', token);
+    else if (_legacyUid) query = query.eq('user_id', _legacyUid);
+    else return null;
+
+    var result = await query.eq('active', true).maybeSingle();
+    return result.data || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+async function init() {
+  _route = await loadRoute();
+  if (!_route) {
+    document.getElementById('s-err').textContent = '❌ هذا الرابط غير صالح أو يحتاج إعادة توليد QR من لوحة التحكم';
+    show('s-err');
+    return;
+  }
+
+  var bizName = _route.business_name || 'محلك';
+  var googleUrl = _route.google_review_url || 'https://maps.google.com';
+  var whatsappUrl = normalizeWhatsappUrl(_route.whatsapp_url);
+  var negativeMessage = _route.negative_message || 'آسفون على تجربتك! تواصل معنا مباشرة وسنعوضك فوراً 💚';
+
+  document.getElementById('biz-name').textContent = bizName;
+  document.getElementById('biz-sub').textContent = 'نسعد بخدمتك في ' + bizName;
+  document.getElementById('neg-msg').textContent = negativeMessage;
+  document.getElementById('google-link').href = googleUrl;
+  document.getElementById('wa-link').href = whatsappUrl || 'https://wa.me/';
+  document.title = 'قيّم ' + bizName;
+
+  if (!whatsappUrl) {
+    document.getElementById('wa-link').style.opacity = '.6';
+    document.getElementById('wa-link').style.pointerEvents = 'none';
+  }
+
+  show('s-survey');
+  track('scan');
+}
+
+async function track(type) {
+  try {
+    await fetch('/api/track-click', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        token: _route?.token || null,
+        userId: _route?.user_id || _legacyUid || null,
+        type: type
+      })
+    });
+  } catch(e) {}
 }
 
 async function choose(type) {
-  show('s-'+type);
-  if (type==='happy' && _googleUrl) {
-    setTimeout(function(){ window.open(_googleUrl,'_blank'); }, 700);
+  if (!_route) return;
+  var stateId = type === 'happy' ? 's-happy' : 's-sad';
+  show(stateId);
+
+  if (type === 'happy') {
+    track('positive_click');
+    setTimeout(function(){
+      track('google_redirect');
+      window.open(_route.google_review_url || 'https://maps.google.com', '_blank', 'noopener');
+    }, 700);
+    return;
   }
-  // Track click for dashboard stats
-  try {
-    fetch('/api/track-click', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ uid: _uid, type: type==='happy' ? 'positive' : 'negative' })
-    });
-  } catch(e) {}
-  try {
-    await sb.from('reviews').insert({
-      user_id: _uid, stars: type==='happy'?5:1,
-      source: 'qr', author_name: 'زائر',
-      review_date: new Date().toISOString().slice(0,10)
-    });
-  } catch(e) {}
-  if (type==='sad' && _ownerPhone) {
-    try {
-      fetch('/api/send-whatsapp', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({
-          type:'notification', phone:_ownerPhone,
-          variables:['⚠️ تقييم سلبي جديد من QR! تواصل مع العميل فوراً.']
-        })
-      });
-    } catch(e) {}
+
+  track('negative_click');
+  if (_route.whatsapp_url) {
+    setTimeout(function(){ track('whatsapp_redirect'); }, 700);
   }
 }
 
