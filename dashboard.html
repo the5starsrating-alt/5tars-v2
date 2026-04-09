@@ -216,6 +216,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <div class="sc gold"><div class="sc-icon">💬</div><div class="sc-num" id="st-total">0</div><div class="sc-label">إجمالي التقييمات</div><div class="sc-change up">من Google</div></div>
     <div class="sc green"><div class="sc-icon">✅</div><div class="sc-num" id="st-replied">0</div><div class="sc-label">تم الرد عليها</div><div class="sc-change up" id="st-rate">نسبة الرد</div></div>
     <div class="sc red"><div class="sc-icon">⏳</div><div class="sc-num" id="st-pending">0</div><div class="sc-label">تنتظر الرد</div><div class="sc-change dn">ردّ عليها الآن</div></div>
+    <div class="sc" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1px solid rgba(22,163,74,.15);"><div class="sc-icon">📱</div><div class="sc-num" id="st-qr-pos" style="color:#16A34A">—</div><div class="sc-label">إيجابي QR</div><div class="sc-change dn" id="st-qr-neg">— سلبي</div></div>
   </div>
   <div class="card">
     <div class="ch"><div class="ct"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--gold)"></i>اقتراحات الذكاء الاصطناعي</div></div>
@@ -429,39 +430,41 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
   <div class="ph">
     <div>
       <div class="pt">🕵️ جاسوس المنافسين</div>
-      <div class="ps">قارن تقييمك بأي منافس عبر Google Place ID</div>
+      <div class="ps">ابحث عن أي منافس بالاسم وقارن تقييمه بتقييمك مباشرة</div>
     </div>
   </div>
 
   <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;">
     <div class="field">
-      <label>Place ID للمنافس</label>
-      <input type="text" id="comp-place-id" placeholder="مثال: ChIJRaCziz0DLz4R6oEHqn4Aveo"
-        style="width:100%;direction:ltr;text-align:left;"
-        onkeydown="if(event.key==='Enter')analyzeCompetitor()">
+      <label>اسم المنافس أو المكان</label>
+      <input type="text" id="comp-query"
+        placeholder="مثال: مطعم الرياض، صالون نورة — جدة"
+        style="width:100%;"
+        onkeydown="if(event.key==='Enter')runCompetitorSearch()">
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
-      للحصول على Place ID: ابحث عن المنافس في Google Maps ← اضغط "مشاركة" ← انسخ الرابط ← استخرج الـ ID
-    </div>
-    <button class="btn bg" id="comp-analyze-btn" onclick="analyzeCompetitor()">
-      🔍 تحليل المنافس
-    </button>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">💡 كن محدداً — أضف المدينة للحصول على نتائج دقيقة</div>
+    <button class="btn bg" id="comp-search-btn" onclick="runCompetitorSearch()">🔍 بحث وتحليل</button>
   </div>
 
   <div id="comp-result" style="display:none">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div style="background:#EEF3FF;border-radius:12px;padding:18px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:8px;">⭐ تقييمك الحالي</div>
+        <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:6px;">⭐ تقييمك الحالي</div>
         <div style="font-family:'Tajawal',sans-serif;font-size:32px;font-weight:900;color:var(--ink);" id="comp-my-rating">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="comp-my-total">— تقييم</div>
       </div>
       <div style="background:#FFF8E7;border-radius:12px;padding:18px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:8px;">🕵️ المنافس</div>
+        <div style="font-size:11px;font-weight:700;color:var(--gold);margin-bottom:4px;" id="comp-found-name">🕵️ المنافس</div>
         <div style="font-family:'Tajawal',sans-serif;font-size:32px;font-weight:900;color:var(--ink);" id="comp-their-rating">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="comp-their-total">— تقييم</div>
       </div>
     </div>
-    <div id="comp-insight" style="border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;"></div>
+    <div id="comp-insight" style="border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;margin-bottom:14px;"></div>
+    <div id="comp-insights-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div id="comp-reviews-section" style="display:none;margin-top:14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;">💬 ما يقوله عملاء المنافس (الإيجابي):</div>
+      <div id="comp-pos-list"></div>
+    </div>
   </div>
 </div>
 
@@ -470,92 +473,73 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 let sb, user, profile, _reviews = [];
 
 
-async function runCompetitor() {
+async function runCompetitorSearch() {
   const query = document.getElementById('comp-query').value.trim();
-  if (!query) { FIVE.toast('أدخل اسم المنافس','error'); return; }
-  const btn = document.getElementById('comp-btn');
-  btn.disabled = true; btn.textContent = '⏳ جاري التحليل...';
-  const myPlaceId = profile?.google_place_id || '';
-  const r = await FIVE.callEdge('competitor', { query, myPlaceId });
-  btn.disabled = false; btn.textContent = '🔍 تحليل المنافس';
-  if (!r.success) { FIVE.toast('❌ '+(r.error||'فشل'),'error'); return; }
-  const c = r.competitor;
-  document.getElementById('comp-result').style.display = 'block';
-  document.getElementById('comp-name').textContent = c.name?.substring(0,18)||'المنافس';
-  document.getElementById('comp-rating').textContent = c.rating ? c.rating+'⭐' : '—';
-  document.getElementById('comp-total').textContent = (c.total||0).toLocaleString('ar')+' تقييم';
-  if (r.mine) {
-    document.getElementById('my-rating').textContent = r.mine.rating+'⭐';
-    document.getElementById('my-total').textContent = (r.mine.total||0).toLocaleString('ar')+' تقييم';
-  }
-  const ins = document.getElementById('comp-insights');
-  ins.innerHTML = (r.insights||[]).map(i=>`<div style="background:#F8FAFF;border-radius:8px;padding:10px 12px;font-size:12px;color:#0B1F4E;">${i}</div>`).join('');
-  if (r.competitorPositives?.length) {
-    document.getElementById('comp-reviews').style.display='block';
-    document.getElementById('comp-pos').innerHTML = r.competitorPositives.map(t=>`<div style="background:#F0FDF4;border-radius:8px;padding:8px 12px;font-size:11px;color:#166534;margin-bottom:6px;">✅ "${t}"</div>`).join('');
-  }
-  FIVE.toast('✅ تم تحليل المنافس!');
-}
+  if (!query) { FIVE.toast('أدخل اسم المنافس أو المكان', 'error'); return; }
 
-
-async function analyzeCompetitor() {
-  const placeId = document.getElementById('comp-place-id').value.trim();
-  const btn = document.getElementById('comp-analyze-btn');
+  const btn = document.getElementById('comp-search-btn');
   const result = document.getElementById('comp-result');
-
-  if (!placeId) { FIVE.toast('أدخل Place ID للمنافس', 'error'); return; }
-
   btn.disabled = true;
-  btn.textContent = '⏳ جاري التحليل...';
+  btn.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span> جاري البحث...';
   result.style.display = 'none';
 
-  const res = await fetch('/api/place-rating', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ place_id: placeId })
-  });
-  const data = await res.json();
+  const myPlaceId = profile?.google_place_id || '';
+  const r = await FIVE.callEdge('competitor', { query, myPlaceId });
 
   btn.disabled = false;
-  btn.textContent = '🔍 تحليل المنافس';
+  btn.innerHTML = '🔍 بحث وتحليل';
 
-  if (!data.success) {
-    FIVE.toast('❌ ' + (data.error || 'فشل التحليل'), 'error');
+  if (!r.success) {
+    FIVE.toast('❌ ' + (r.error || 'لم يُعثر على المنافس — حاول بكتابة أدق'), 'error');
     return;
   }
 
-  // تقييمي من الـ profile
-  const myRating  = parseFloat(document.getElementById('avg-rating')?.textContent) || 0;
-  const myTotal   = parseInt(document.getElementById('rev-count')?.textContent?.replace(/,/g,'')) || 0;
+  const c = r.competitor;
+  const myRating = r.mine?.rating || parseFloat(document.getElementById('avg-rating')?.textContent) || 0;
+  const myTotal  = r.mine?.total  || parseInt(document.getElementById('rev-count')?.textContent?.replace(/\D/g,'')) || 0;
 
-  document.getElementById('comp-my-rating').textContent   = myRating  ? myRating + ' ⭐'  : '—';
-  document.getElementById('comp-my-total').textContent    = myTotal   ? myTotal.toLocaleString('ar') + ' تقييم' : '—';
-  document.getElementById('comp-their-rating').textContent = data.rating + ' ⭐';
-  document.getElementById('comp-their-total').textContent  = (data.total || 0).toLocaleString('ar') + ' تقييم';
+  // Fill cards
+  document.getElementById('comp-found-name').textContent = '🕵️ ' + (c.name?.substring(0, 22) || 'المنافس');
+  document.getElementById('comp-my-rating').textContent    = myRating ? myRating + ' ⭐' : '—';
+  document.getElementById('comp-my-total').textContent     = myTotal  ? myTotal.toLocaleString('ar') + ' تقييم' : '—';
+  document.getElementById('comp-their-rating').textContent = c.rating ? c.rating + ' ⭐' : '—';
+  document.getElementById('comp-their-total').textContent  = (c.total||0).toLocaleString('ar') + ' تقييم';
 
+  // Main insight
   const insight = document.getElementById('comp-insight');
-  const diff = (data.rating - myRating).toFixed(1);
-
   if (!myRating) {
-    insight.style.background = '#EEF3FF';
-    insight.style.color = 'var(--blue)';
-    insight.textContent = '📊 المنافس: ' + data.rating + '⭐ بـ ' + data.total.toLocaleString('ar') + ' تقييم';
-  } else if (data.rating > myRating) {
-    insight.style.background = '#FEF2F2';
-    insight.style.color = '#DC2626';
-    insight.innerHTML = '⚠️ المنافس أعلى منك بـ ' + diff + ' نجمة — ركّز على جودة الخدمة والردود السريعة';
-  } else if (data.rating < myRating) {
-    insight.style.background = '#F0FDF4';
-    insight.style.color = '#16A34A';
-    insight.innerHTML = '✅ أنت أعلى من المنافس بـ ' + Math.abs(diff) + ' نجمة — استمر في نفس المستوى!';
+    insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#EEF3FF;color:var(--blue);margin-bottom:14px;';
+    insight.textContent = '📊 المنافس: ' + c.rating + '⭐ — اربط Google Business لمقارنة تقييمك';
   } else {
-    insight.style.background = '#FFF8E7';
-    insight.style.color = 'var(--gold)';
-    insight.textContent = '🟡 نفس التقييم — ركّز على زيادة عدد تقييماتك للتميّز';
+    const diff = (c.rating - myRating).toFixed(1);
+    if (c.rating > myRating) {
+      insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#FEF2F2;color:#DC2626;margin-bottom:14px;';
+      insight.innerHTML = '⚠️ المنافس أعلى منك بـ ' + diff + ' نجمة — ركّز على الردود السريعة وطلب التقييمات';
+    } else if (c.rating < myRating) {
+      insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#F0FDF4;color:#16A34A;margin-bottom:14px;';
+      insight.innerHTML = '✅ أنت أعلى من المنافس بـ ' + Math.abs(diff) + ' نجمة — استمر في نفس المستوى!';
+    } else {
+      insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#FFF8E7;color:var(--gold);margin-bottom:14px;';
+      insight.textContent = '🟡 نفس التقييم — ركّز على زيادة عدد تقييماتك للتميّز';
+    }
+  }
+
+  // Extra insights list
+  const insList = document.getElementById('comp-insights-list');
+  insList.innerHTML = (r.insights||[]).map(i =>
+    `<div style="background:#F8FAFF;border-radius:8px;padding:10px 12px;font-size:12px;color:#0B1F4E;">${i}</div>`
+  ).join('');
+
+  // Competitor positive reviews
+  if (r.competitorPositives?.length) {
+    document.getElementById('comp-reviews-section').style.display = 'block';
+    document.getElementById('comp-pos-list').innerHTML = r.competitorPositives.map(t =>
+      `<div style="background:#F0FDF4;border-radius:8px;padding:8px 12px;font-size:11px;color:#166534;margin-bottom:6px;">✅ "${t}"</div>`
+    ).join('');
   }
 
   result.style.display = 'block';
-  FIVE.toast('✅ تم التحليل!');
+  FIVE.toast('✅ تم تحليل المنافس: ' + (c.name || query));
 }
 
 async function init() {
@@ -628,6 +612,20 @@ async function loadData() {
 
   renderReviews(_reviews);
   renderRecent(_reviews.slice(0,3));
+  loadQrStats();
+}
+
+async function loadQrStats() {
+  try {
+    const today = new Date();
+    const monthAgo = new Date(today - 30*24*60*60*1000).toISOString();
+    const { data: clicks } = await sb.from('clicks').select('type').eq('uid', user.id).gte('created_at', monthAgo);
+    if (!clicks) return;
+    const pos = clicks.filter(c => c.type === 'positive').length;
+    const neg = clicks.filter(c => c.type === 'negative').length;
+    document.getElementById('st-qr-pos').textContent = pos;
+    document.getElementById('st-qr-neg').textContent = neg + ' سلبي';
+  } catch(e) {}
 }
 
 function renderReviews(rows) {
@@ -950,6 +948,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
