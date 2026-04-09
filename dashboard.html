@@ -271,8 +271,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
         </div>
       </div>
       <div class="qr-form">
-        <div class="field"><label>اسم المحل</label><input type="text" id="qr-name" placeholder="مطعم الوادي" oninput="genQR()"></div>
-        <div class="field"><label>رابط Google Review (اختياري)</label><input type="url" id="qr-link" placeholder="https://g.page/r/..." oninput="genQR()"></div>
+        <div class="field"><label>اسم المحل</label><input type="text" id="qr-name" placeholder="مطعم الوادي" readonly></div>
+        <input type="hidden" id="qr-link">
         <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:9px;padding:10px;font-size:11px;color:#166534;margin-top:8px;">✅ الباركود يوجّه لصفحة review.html الذكية الخاصة بحسابك تلقائياً</div>
       </div>
     </div>
@@ -474,7 +474,7 @@ async function init() {
   if (!profile?.google_connected) document.getElementById('cbanner').style.display = 'flex';
   else {
     document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div><div style="font-size:10px;color:var(--muted);margin-top:3px;word-break:break-all">${(profile.google_place_id||'').substring(0,45)}...</div>`;
-    if (profile.google_place_id) document.getElementById('qr-link').value = profile.google_place_id;
+    // qr-link لا يُستخدم — الرابط دائماً review.html?uid=
   }
 
   // Load data
@@ -604,7 +604,7 @@ async function waReply(btn, name) {
 // QR
 let _qrObj = null;
 function genQR() {
-  const link = document.getElementById('qr-link')?.value?.trim() || (window.location.origin+'/review.html?uid='+(user?.id||''));
+  const link = window.location.origin + '/review.html?uid=' + (user?.id || '');
   const el = document.getElementById('qrcode');
   el.innerHTML = '';
   try {
