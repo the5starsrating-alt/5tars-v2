@@ -374,40 +374,42 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 
 <!-- ── DIAGNOSIS ── -->
 <div class="sec" id="s-diag">
-  <div class="ph"><div><div class="pt">🩺 أداة التشخيص</div><div class="ps">حلل نقاط ضعف تقييماتك واحصل على خطة تحسين مخصصة</div></div></div>
+  <div class="ph"><div><div class="pt">🩺 أداة التشخيص</div><div class="ps">أدخل رابط Google Maps لأي مشروع واحصل على تشخيص كامل وخطة تحسين</div></div></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-    <div class="card">
-      <div class="ct" style="margin-bottom:14px;">📊 نتائج التشخيص</div>
-      <div id="diag-scores">
-        <div class="empty"><div class="empty-icon">🩺</div><h3>اضغط "ابدأ التشخيص" لتحليل حسابك</h3></div>
-      </div>
+  <!-- URL input card -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="ct" style="margin-bottom:14px;">🔗 رابط Google Maps للمشروع</div>
+    <div class="field" style="margin-bottom:10px;">
+      <input type="url" id="diag-url"
+        placeholder="https://maps.app.goo.gl/... أو https://maps.google.com/..."
+        style="width:100%;direction:ltr;text-align:left;font-size:13px;"
+        onkeydown="if(event.key==='Enter')runDiagnosis()">
     </div>
-    <div class="card">
-      <div class="ct" style="margin-bottom:14px;">💡 خطة التحسين</div>
-      <div id="diag-plan">
-        <div class="empty"><div class="empty-icon">📋</div><h3>ستظهر هنا بعد التشخيص</h3></div>
-      </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+      💡 افتح محلك في Google Maps ← اضغط "مشاركة" ← انسخ الرابط والصقه هنا
+      <span id="diag-autofill-hint" style="display:none;"> · <a href="#" onclick="useSavedLink();return false;" style="color:var(--blue);font-weight:700;">استخدم رابطك المحفوظ ↗</a></span>
     </div>
+    <button class="btn bg" id="diag-btn" onclick="runDiagnosis()" style="min-width:200px;">🩺 ابدأ التشخيص الآن</button>
   </div>
 
-  <div class="card">
-    <div class="ct" style="margin-bottom:16px;">⚙️ إعدادات التشخيص</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-      <div class="field"><label>متوسط تقييمي الحالي</label><input type="number" id="diag-rating" step="0.1" min="1" max="5" placeholder="مثال: 4.2"></div>
-      <div class="field"><label>عدد التقييمات الكلي</label><input type="number" id="diag-total" placeholder="مثال: 47"></div>
-      <div class="field"><label>عدد التقييمات السلبية (أقل من 3)</label><input type="number" id="diag-neg" placeholder="مثال: 5"></div>
-      <div class="field"><label>نسبة الرد على التقييمات</label>
-        <select id="diag-reply-rate">
-          <option value="0">لا أرد أبداً</option>
-          <option value="25">أرد أحياناً (25%)</option>
-          <option value="50">أرد على النصف</option>
-          <option value="75">أرد على معظمها</option>
-          <option value="100">أرد على الكل</option>
-        </select>
+  <!-- Results grid -->
+  <div id="diag-results-wrap" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="ct" style="margin-bottom:14px;">📊 نتائج التشخيص</div>
+        <div id="diag-scores"></div>
+      </div>
+      <div class="card">
+        <div class="ct" style="margin-bottom:14px;">💡 خطة التحسين</div>
+        <div id="diag-plan"></div>
       </div>
     </div>
-    <button class="btn bg" id="diag-btn" onclick="runDiagnosis()" style="min-width:180px;">🩺 ابدأ التشخيص</button>
+
+    <!-- Fetched reviews -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">💬 آخر التقييمات المسحوبة من Google</div>
+      <div id="diag-reviews-list"></div>
+    </div>
   </div>
 </div>
 
@@ -430,20 +432,22 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
   <div class="ph">
     <div>
       <div class="pt">🕵️ جاسوس المنافسين</div>
-      <div class="ps">ابحث عن أي منافس بالاسم وقارن تقييمه بتقييمك مباشرة</div>
+      <div class="ps">الصق رابط Google Maps لأي منافس — يسحب تقييماته ويقارنها بمشروعك</div>
     </div>
   </div>
 
-  <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;">
-    <div class="field">
-      <label>اسم المنافس أو المكان</label>
-      <input type="text" id="comp-query"
-        placeholder="مثال: مطعم الرياض، صالون نورة — جدة"
-        style="width:100%;"
+  <div class="card" style="margin-bottom:16px;">
+    <div class="ct" style="margin-bottom:14px;">🔗 رابط Google Maps للمنافس</div>
+    <div class="field" style="margin-bottom:10px;">
+      <input type="url" id="comp-url"
+        placeholder="https://maps.app.goo.gl/... أو https://maps.google.com/..."
+        style="width:100%;direction:ltr;text-align:left;font-size:13px;"
         onkeydown="if(event.key==='Enter')runCompetitorSearch()">
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">💡 كن محدداً — أضف المدينة للحصول على نتائج دقيقة</div>
-    <button class="btn bg" id="comp-search-btn" onclick="runCompetitorSearch()">🔍 بحث وتحليل</button>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+      💡 افتح صفحة المنافس في Google Maps ← اضغط "مشاركة" ← انسخ الرابط والصقه هنا
+    </div>
+    <button class="btn bg" id="comp-search-btn" onclick="runCompetitorSearch()">🕵️ تحليل المنافس</button>
   </div>
 
   <div id="comp-result" style="display:none">
@@ -460,10 +464,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
       </div>
     </div>
     <div id="comp-insight" style="border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;margin-bottom:14px;"></div>
-    <div id="comp-insights-list" style="display:flex;flex-direction:column;gap:8px;"></div>
-    <div id="comp-reviews-section" style="display:none;margin-top:14px;">
-      <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;">💬 ما يقوله عملاء المنافس (الإيجابي):</div>
-      <div id="comp-pos-list"></div>
+    <div id="comp-insights-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">💬 تقييمات عملاء المنافس من Google</div>
+      <div id="comp-reviews-list"></div>
     </div>
   </div>
 </div>
@@ -473,73 +477,103 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 let sb, user, profile, _reviews = [];
 
 
+// ── shared helper: render review cards ──
+function renderReviewCards(reviews, containerId) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  if (!reviews || !reviews.length) {
+    c.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px;">لا توجد تقييمات متاحة</div>';
+    return;
+  }
+  const starsStr = n => '★'.repeat(Math.min(5,n||0)) + '☆'.repeat(5-Math.min(5,n||0));
+  const colorSt = n => n >= 4 ? '#F5B429' : n === 3 ? '#94A3B8' : '#EF4444';
+  c.innerHTML = reviews.map(r => `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--ink2));color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${(r.author||r.author_name||'م').charAt(0)}</div>
+          <div style="font-size:12px;font-weight:700;color:var(--ink);">${r.author||r.author_name||'مجهول'}</div>
+        </div>
+        <div style="color:${colorSt(r.stars||r.rating)};font-size:13px;">${starsStr(r.stars||r.rating)}</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7;">${(r.text||r.review_text||'').substring(0,200)}${((r.text||r.review_text||'').length>200?'…':'')}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;opacity:.7;">${r.date||r.review_date||''}</div>
+    </div>
+  `).join('');
+}
+
+// ── Competitor Search via Google Maps URL ──
 async function runCompetitorSearch() {
-  const query = document.getElementById('comp-query').value.trim();
-  if (!query) { FIVE.toast('أدخل اسم المنافس أو المكان', 'error'); return; }
+  const url = document.getElementById('comp-url').value.trim();
+  if (!url) { FIVE.toast('الصق رابط Google Maps للمنافس', 'error'); return; }
+  if (!url.includes('google') && !url.includes('goo.gl') && !url.includes('maps')) {
+    FIVE.toast('الرابط يبدو غير صحيح — انسخه من Google Maps', 'error'); return;
+  }
 
   const btn = document.getElementById('comp-search-btn');
   const result = document.getElementById('comp-result');
+  const spinner = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span>';
   btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span> جاري البحث...';
+  btn.innerHTML = spinner + ' جاري سحب البيانات...';
   result.style.display = 'none';
 
-  const myPlaceId = profile?.google_place_id || '';
-  const r = await FIVE.callEdge('competitor', { query, myPlaceId });
+  // Use get-reviews API — works with any Google Maps URL
+  const r = await FIVE.callEdge('get-reviews', { mapsUrl: url });
 
   btn.disabled = false;
-  btn.innerHTML = '🔍 بحث وتحليل';
+  btn.innerHTML = '🕵️ تحليل المنافس';
 
   if (!r.success) {
-    FIVE.toast('❌ ' + (r.error || 'لم يُعثر على المنافس — حاول بكتابة أدق'), 'error');
+    FIVE.toast('❌ ' + (r.error || 'تعذّر الوصول — تأكد من الرابط'), 'error');
     return;
   }
 
-  const c = r.competitor;
-  const myRating = r.mine?.rating || parseFloat(document.getElementById('avg-rating')?.textContent) || 0;
-  const myTotal  = r.mine?.total  || parseInt(document.getElementById('rev-count')?.textContent?.replace(/\D/g,'')) || 0;
+  // My stats
+  const myRating = parseFloat(document.getElementById('st-rating')?.textContent) || 0;
+  const myTotal  = parseInt((document.getElementById('st-total')?.textContent||'0').replace(/\D/g,'')) || 0;
 
-  // Fill cards
-  document.getElementById('comp-found-name').textContent = '🕵️ ' + (c.name?.substring(0, 22) || 'المنافس');
-  document.getElementById('comp-my-rating').textContent    = myRating ? myRating + ' ⭐' : '—';
-  document.getElementById('comp-my-total').textContent     = myTotal  ? myTotal.toLocaleString('ar') + ' تقييم' : '—';
-  document.getElementById('comp-their-rating').textContent = c.rating ? c.rating + ' ⭐' : '—';
-  document.getElementById('comp-their-total').textContent  = (c.total||0).toLocaleString('ar') + ' تقييم';
+  document.getElementById('comp-found-name').textContent  = '🕵️ ' + (r.name||'المنافس').substring(0,22);
+  document.getElementById('comp-my-rating').textContent   = myRating ? myRating + ' ⭐' : '—';
+  document.getElementById('comp-my-total').textContent    = myTotal  ? myTotal.toLocaleString('ar') + ' تقييم' : '—';
+  document.getElementById('comp-their-rating').textContent = (r.rating||0) + ' ⭐';
+  document.getElementById('comp-their-total').textContent  = (r.total||0).toLocaleString('ar') + ' تقييم';
 
-  // Main insight
+  // Insight
   const insight = document.getElementById('comp-insight');
+  const theirR = r.rating || 0;
   if (!myRating) {
     insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#EEF3FF;color:var(--blue);margin-bottom:14px;';
-    insight.textContent = '📊 المنافس: ' + c.rating + '⭐ — اربط Google Business لمقارنة تقييمك';
+    insight.textContent = '📊 ' + r.name + ': ' + theirR + '⭐ بـ ' + (r.total||0).toLocaleString('ar') + ' تقييم';
   } else {
-    const diff = (c.rating - myRating).toFixed(1);
-    if (c.rating > myRating) {
+    const diff = (theirR - myRating).toFixed(1);
+    if (theirR > myRating) {
       insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#FEF2F2;color:#DC2626;margin-bottom:14px;';
-      insight.innerHTML = '⚠️ المنافس أعلى منك بـ ' + diff + ' نجمة — ركّز على الردود السريعة وطلب التقييمات';
-    } else if (c.rating < myRating) {
+      insight.innerHTML = '⚠️ المنافس أعلى منك بـ ' + diff + ' نجمة';
+    } else if (theirR < myRating) {
       insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#F0FDF4;color:#16A34A;margin-bottom:14px;';
-      insight.innerHTML = '✅ أنت أعلى من المنافس بـ ' + Math.abs(diff) + ' نجمة — استمر في نفس المستوى!';
+      insight.innerHTML = '✅ أنت أعلى بـ ' + Math.abs(diff) + ' نجمة — استمر!';
     } else {
       insight.style.cssText = 'border-radius:12px;padding:14px;font-size:13px;font-weight:700;text-align:center;background:#FFF8E7;color:var(--gold);margin-bottom:14px;';
-      insight.textContent = '🟡 نفس التقييم — ركّز على زيادة عدد تقييماتك للتميّز';
+      insight.textContent = '🟡 نفس التقييم — ركّز على زيادة عدد تقييماتك';
     }
   }
 
-  // Extra insights list
-  const insList = document.getElementById('comp-insights-list');
-  insList.innerHTML = (r.insights||[]).map(i =>
+  // Volume + reply gap insights
+  const extras = [];
+  if (myRating && r.total > myTotal * 1.5)
+    extras.push(`⚠️ المنافس عنده ${r.total} تقييم — أنت ${myTotal} فقط`);
+  if (myRating && r.total < myTotal)
+    extras.push(`✅ عندك تقييمات أكثر من المنافس بـ ${myTotal - r.total}`);
+
+  document.getElementById('comp-insights-list').innerHTML = extras.map(i =>
     `<div style="background:#F8FAFF;border-radius:8px;padding:10px 12px;font-size:12px;color:#0B1F4E;">${i}</div>`
   ).join('');
 
-  // Competitor positive reviews
-  if (r.competitorPositives?.length) {
-    document.getElementById('comp-reviews-section').style.display = 'block';
-    document.getElementById('comp-pos-list').innerHTML = r.competitorPositives.map(t =>
-      `<div style="background:#F0FDF4;border-radius:8px;padding:8px 12px;font-size:11px;color:#166534;margin-bottom:6px;">✅ "${t}"</div>`
-    ).join('');
-  }
+  // Reviews
+  renderReviewCards(r.reviews, 'comp-reviews-list');
 
   result.style.display = 'block';
-  FIVE.toast('✅ تم تحليل المنافس: ' + (c.name || query));
+  FIVE.toast('✅ تم سحب ' + (r.reviews?.length||0) + ' تقييم من Google');
 }
 
 async function init() {
@@ -569,6 +603,11 @@ async function init() {
   }
 
   if (!profile?.google_connected) document.getElementById('cbanner').style.display = 'flex';
+  // Show hint in diagnosis if saved link exists
+  if (profile?.google_place_id) {
+    const hint = document.getElementById('diag-autofill-hint');
+    if (hint) hint.style.display = 'inline';
+  }
   else {
     document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div><div style="font-size:10px;color:var(--muted);margin-top:3px;word-break:break-all">${(profile.google_place_id||'').substring(0,45)}...</div>`;
     // qr-link لا يُستخدم — الرابط دائماً review.html?uid=
@@ -821,17 +860,49 @@ function buildSuggestions() {
 }
 
 
-// ── Diagnosis ──
-async function runDiagnosis() {
-  const btn = document.getElementById('diag-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التحليل...';
+// ── shared: show saved link hint for diagnosis ──
+function useSavedLink() {
+  const saved = profile?.google_place_id || '';
+  if (saved) {
+    document.getElementById('diag-url').value = saved;
+    runDiagnosis();
+  }
+}
 
-  const rating = parseFloat(document.getElementById('diag-rating').value) || parseFloat(document.getElementById('st-rating')?.textContent) || 0;
-  const total = parseInt(document.getElementById('diag-total').value) || parseInt(document.getElementById('st-total')?.textContent) || 0;
-  const neg = parseInt(document.getElementById('diag-neg').value) || 0;
-  const replyRate = parseInt(document.getElementById('diag-reply-rate').value) || 0;
-  const connected = profile?.google_connected || false;
+// ── Diagnosis via Google Maps URL ──
+async function runDiagnosis() {
+  const urlVal = document.getElementById('diag-url').value.trim();
+  const btn = document.getElementById('diag-btn');
+  const spinner = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span>';
+
+  // Require a URL
+  if (!urlVal) { FIVE.toast('الصق رابط Google Maps أولاً', 'error'); return; }
+  if (!urlVal.includes('google') && !urlVal.includes('goo.gl') && !urlVal.includes('maps')) {
+    FIVE.toast('الرابط يبدو غير صحيح — انسخه من Google Maps', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = spinner + ' جاري سحب البيانات...';
+  document.getElementById('diag-results-wrap').style.display = 'none';
+
+  // Fetch from Google via get-reviews API
+  const data = await FIVE.callEdge('get-reviews', { mapsUrl: urlVal });
+
+  btn.disabled = false;
+  btn.innerHTML = '🔄 أعد التشخيص';
+
+  if (!data.success) {
+    FIVE.toast('❌ ' + (data.error || 'تعذّر جلب البيانات — تأكد من الرابط'), 'error');
+    return;
+  }
+
+  const rating = data.rating || 0;
+  const total  = data.total  || 0;
+  const reviews = data.reviews || [];
+  const neg = reviews.filter(r => (r.stars||r.rating||3) <= 2).length;
+  const repliedCount = reviews.filter(r => r.replied).length;
+  const replyRate = reviews.length ? Math.round(repliedCount / reviews.length * 100) : 0;
+  const connected = !!urlVal;
 
   // Score each dimension
   const scores = {
@@ -904,9 +975,12 @@ async function runDiagnosis() {
     </div>
   `).join('');
 
-  btn.disabled = false;
-  btn.innerHTML = '🔄 أعد التشخيص';
-  FIVE.toast('✅ اكتمل التشخيص!');
+  document.getElementById('diag-results-wrap').style.display = 'block';
+
+  // Show pulled reviews
+  renderReviewCards(reviews, 'diag-reviews-list');
+
+  FIVE.toast('✅ تشخيص ' + (data.name||'المشروع') + ' اكتمل — ' + reviews.length + ' تقييم');
 }
 
 // ── Auto Reply Toggle ──
@@ -948,6 +1022,7 @@ init();
 </script>
 </body>
 </html>
+
 
 
 
