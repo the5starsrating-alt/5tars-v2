@@ -113,6 +113,13 @@ async function choose(type) {
   if (type==='happy' && _googleUrl) {
     setTimeout(function(){ window.open(_googleUrl,'_blank'); }, 700);
   }
+  // Track click for dashboard stats
+  try {
+    fetch('/api/track-click', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ uid: _uid, type: type==='happy' ? 'positive' : 'negative' })
+    });
+  } catch(e) {}
   try {
     await sb.from('reviews').insert({
       user_id: _uid, stars: type==='happy'?5:1,
