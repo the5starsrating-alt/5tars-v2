@@ -122,13 +122,14 @@ async function doSignup() {
     btn.textContent='ابدأ تجربتي المجانية ←';
     return;
   }
-  if (result.data && result.data.user) {
-    fetch('/api/signup-confirm', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ userId:result.data.user.id, email:email, full_name:name, phone:phone, business_type:btype })
-    });
+  if (result.data && result.data.session) {
+    window.location.href = '/dashboard.html';
+    return;
   }
-  window.location.href = '/dashboard.html';
+  err.textContent = 'تم إنشاء الحساب. إذا لم تدخل مباشرة، تحقق من بريدك الإلكتروني ثم سجّل الدخول.';
+  err.className='err show';
+  btn.disabled=false;
+  btn.textContent='ابدأ تجربتي المجانية ←';
 }
 </script>
 </body>
