@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5tars — تقديم شكوى</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:#F0F4FF;direction:rtl;color:#0B1F4E;}
+nav{background:#0B1F4E;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.logo{font-family:'Tajawal',sans-serif;font-size:24px;font-weight:900;direction:ltr;text-decoration:none;}
+.l5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
+.lt{color:#fff;}
+.nav-back{color:rgba(255,255,255,.7);font-size:13px;text-decoration:none;}
+.hero{background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff;padding:48px 24px;text-align:center;}
+.hero h1{font-family:'Tajawal',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:900;margin-bottom:10px;}
+.hero p{font-size:14px;color:rgba(255,255,255,.8);line-height:1.7;}
+.container{max-width:700px;margin:0 auto;padding:40px 24px;}
+.sla-bar{background:#fff;border-radius:16px;padding:24px;margin-bottom:24px;display:flex;gap:0;border:1px solid rgba(34,81,211,.08);}
+.sla-item{flex:1;text-align:center;padding:0 12px;border-left:1px solid #E2E8F0;}
+.sla-item:last-child{border-left:none;}
+.sla-num{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;color:#DC2626;}
+.sla-label{font-size:11px;color:#64748B;margin-top:4px;line-height:1.5;}
+.form-card{background:#fff;border-radius:16px;padding:28px;border:1px solid rgba(34,81,211,.08);margin-bottom:20px;}
+.form-card h2{font-size:17px;font-weight:900;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.field{margin-bottom:14px;}
+label{display:block;font-size:12px;font-weight:700;color:#3B5080;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:11px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;color:#0B1F4E;outline:none;transition:border-color .2s;background:#fff;}
+textarea{resize:vertical;min-height:110px;}
+input:focus,select:focus,textarea:focus{border-color:#DC2626;box-shadow:0 0 0 3px rgba(220,38,38,.07);}
+.btn-red{width:100%;padding:13px;background:linear-gradient(135deg,#DC2626,#991B1B);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;cursor:pointer;}
+.alt-channels{background:#FEF2F2;border:1px solid rgba(220,38,38,.15);border-radius:12px;padding:16px;font-size:13px;}
+.alt-channels h3{font-size:13px;font-weight:900;margin-bottom:10px;color:#DC2626;}
+.channel{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;color:#475569;}
+.ticket{background:#F0FDF4;border:2px solid #BBF7D0;border-radius:12px;padding:16px;margin-top:16px;display:none;text-align:center;}
+.ticket-num{font-family:'Tajawal',sans-serif;font-size:28px;font-weight:900;color:#16A34A;}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="l5">5</span><span class="lt">tars</span></a>
+  <a href="/" class="nav-back">← الرئيسية</a>
+</nav>
+<div class="hero">
+  <h1>تقديم شكوى 📋</h1>
+  <p>نأخذ كل شكوى بجدية تامة. حقوق المستخدم أولويتنا.<br>نلتزم بالرد خلال 24 ساعة ومعالجة الشكوى خلال 5 أيام عمل.</p>
+</div>
+<div class="container">
+  <!-- SLA مضمونة -->
+  <div class="sla-bar">
+    <div class="sla-item">
+      <div class="sla-num">24 س</div>
+      <div class="sla-label">الرد الأولي<br>على الشكوى</div>
+    </div>
+    <div class="sla-item">
+      <div class="sla-num">5 أيام</div>
+      <div class="sla-label">معالجة<br>الشكوى كاملة</div>
+    </div>
+    <div class="sla-item">
+      <div class="sla-num">7 أيام</div>
+      <div class="sla-label">استرجاع<br>المبالغ</div>
+    </div>
+  </div>
+
+  <!-- نموذج الشكوى -->
+  <div class="form-card">
+    <h2>📝 نموذج تقديم الشكوى</h2>
+    <div class="field">
+      <label>الاسم الكامل</label>
+      <input type="text" id="comp-name" placeholder="محمد العمري">
+    </div>
+    <div class="field">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="comp-email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>رقم الهاتف / واتساب</label>
+      <input type="tel" id="comp-phone" placeholder="05xxxxxxxx">
+    </div>
+    <div class="field">
+      <label>نوع الشكوى</label>
+      <select id="comp-type">
+        <option value="">اختر نوع الشكوى...</option>
+        <option>مشكلة في الفوترة أو الدفع</option>
+        <option>خدمة لم تعمل كما هو متوقع</option>
+        <option>طلب استرجاع مبلغ</option>
+        <option>مشكلة تقنية في المنصة</option>
+        <option>سوء في خدمة العملاء</option>
+        <option>انتهاك سياسة الخصوصية</option>
+        <option>أخرى</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>تفاصيل الشكوى</label>
+      <textarea id="comp-details" placeholder="اشرح شكواك بالتفصيل — كلما كانت التفاصيل أوضح كان حلها أسرع..."></textarea>
+    </div>
+    <div class="field">
+      <label>رقم الفاتورة / الاشتراك (اختياري)</label>
+      <input type="text" id="comp-ref" placeholder="INV-XXXXX">
+    </div>
+    <button class="btn-red" onclick="submitComplaint()">تقديم الشكوى ←</button>
+    <div class="ticket" id="comp-ticket">
+      <div style="font-size:13px;color:#64748B;margin-bottom:8px;">✅ تم استلام شكواك</div>
+      <div class="ticket-num" id="ticket-num">#0000</div>
+      <div style="font-size:12px;color:#64748B;margin-top:8px;">احتفظ بهذا الرقم للمتابعة.<br>سنرد على بريدك الإلكتروني خلال 24 ساعة.</div>
+    </div>
+  </div>
+
+  <!-- قنوات بديلة -->
+  <div class="alt-channels">
+    <h3>قنوات بديلة لتقديم الشكوى:</h3>
+    <div class="channel">📱 واتساب: <a href="https://wa.me/966555867232" target="_blank" style="color:#DC2626;font-weight:700">+966 55 586 7232</a></div>
+    <div class="channel">📧 إيميل: <a href="mailto:the5starsrating@gmail.com" style="color:#DC2626;font-weight:700">the5starsrating@gmail.com</a></div>
+    <div class="channel">🏛️ منصة مستهلك: <a href="https://mc.gov.sa" target="_blank" style="color:#DC2626;font-weight:700">mc.gov.sa</a></div>
+    <div class="channel">📲 تويتر/X: <a href="https://x.com" target="_blank" style="color:#DC2626;font-weight:700">@5tarsrating</a></div>
+  </div>
+</div>
+
+<script>
+function submitComplaint() {
+  var name=document.getElementById('comp-name').value.trim();
+  var email=document.getElementById('comp-email').value.trim();
+  var type=document.getElementById('comp-type').value;
+  var details=document.getElementById('comp-details').value.trim();
+  if (!name||!email||!type||!details) { alert('يرجى تعبئة جميع الحقول الإلزامية'); return; }
+  var ticketNum = '#' + Date.now().toString().slice(-6);
+  document.getElementById('ticket-num').textContent = ticketNum;
+  document.getElementById('comp-ticket').style.display = 'block';
+  var waMsg = '🚨 شكوى جديدة '+ticketNum+'\n\nالاسم: '+name+'\nالإيميل: '+email+'\nالنوع: '+type+'\nالتفاصيل: '+details;
+  window.open('https://wa.me/966555867232?text='+encodeURIComponent(waMsg),'_blank');
+}
+</script>
+</body>
+</html>
