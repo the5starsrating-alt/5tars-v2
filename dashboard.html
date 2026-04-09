@@ -192,6 +192,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <button class="ni" onclick="show('request',this)"><i class="fa-solid fa-paper-plane fa-fw"></i>طلب تقييم</button>
     <button class="ni" onclick="show('settings',this)"><i class="fa-solid fa-gear fa-fw"></i>الإعدادات</button>
     <button class="ni" onclick="show('comp',this)"><i class="fa-solid fa-magnifying-glass fa-fw"></i>جاسوس المنافسين</button>
+    <button class="ni" onclick="show('diag',this)"><i class="fa-solid fa-stethoscope fa-fw"></i>أداة التشخيص</button>
   </div>
   <div class="sb-foot"><button class="logout-btn" onclick="FIVE.signOut()"><i class="fa-solid fa-right-from-bracket"></i>تسجيل الخروج</button></div>
 </div>
@@ -332,7 +333,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <div class="card">
       <div class="ct" style="margin-bottom:14px;">🔔 الإشعارات</div>
       <div class="trow"><div class="tinfo"><div class="tl">إشعار واتساب عند تقييم جديد</div><div class="ts">يصلك فوراً عند كل تقييم</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="trow"><div class="tinfo"><div class="tl">رد تلقائي بالذكاء الاصطناعي</div><div class="ts">يرد تلقائياً بعد موافقتك</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="trow"><div class="tinfo"><div class="tl">رد تلقائي بالذكاء الاصطناعي</div><div class="ts">يرد تلقائياً بعد موافقتك — للباقة الاحترافية فأعلى</div></div><div class="toggle" id="toggle-auto-reply" onclick="toggleAutoReply(this)"></div></div>
       <div class="trow"><div class="tinfo"><div class="tl">تنبيه التقييمات السلبية</div><div class="ts">إشعار خاص لتقييمات أقل من 3</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="trow"><div class="tinfo"><div class="tl">تقرير أسبوعي</div><div class="ts">ملخص كل جمعة</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
     </div>
@@ -369,6 +370,46 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
   </div>
 </div>
 
+
+<!-- ── DIAGNOSIS ── -->
+<div class="sec" id="s-diag">
+  <div class="ph"><div><div class="pt">🩺 أداة التشخيص</div><div class="ps">حلل نقاط ضعف تقييماتك واحصل على خطة تحسين مخصصة</div></div></div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">📊 نتائج التشخيص</div>
+      <div id="diag-scores">
+        <div class="empty"><div class="empty-icon">🩺</div><h3>اضغط "ابدأ التشخيص" لتحليل حسابك</h3></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px;">💡 خطة التحسين</div>
+      <div id="diag-plan">
+        <div class="empty"><div class="empty-icon">📋</div><h3>ستظهر هنا بعد التشخيص</h3></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct" style="margin-bottom:16px;">⚙️ إعدادات التشخيص</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+      <div class="field"><label>متوسط تقييمي الحالي</label><input type="number" id="diag-rating" step="0.1" min="1" max="5" placeholder="مثال: 4.2"></div>
+      <div class="field"><label>عدد التقييمات الكلي</label><input type="number" id="diag-total" placeholder="مثال: 47"></div>
+      <div class="field"><label>عدد التقييمات السلبية (أقل من 3)</label><input type="number" id="diag-neg" placeholder="مثال: 5"></div>
+      <div class="field"><label>نسبة الرد على التقييمات</label>
+        <select id="diag-reply-rate">
+          <option value="0">لا أرد أبداً</option>
+          <option value="25">أرد أحياناً (25%)</option>
+          <option value="50">أرد على النصف</option>
+          <option value="75">أرد على معظمها</option>
+          <option value="100">أرد على الكل</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn bg" id="diag-btn" onclick="runDiagnosis()" style="min-width:180px;">🩺 ابدأ التشخيص</button>
+  </div>
+</div>
+
 </div><!-- end main -->
 
 <!-- Google Modal -->
@@ -383,23 +424,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
       <button id="g-save-btn" onclick="saveGoogleLink()" style="padding:10px 18px;background:linear-gradient(135deg,var(--blue),var(--ink2));color:#fff;border:none;border-radius:9px;font-family:Cairo;font-weight:700;cursor:pointer;">حفظ الرابط</button>
     </div>
   </div>
-
-
-      <div style="background:#FFF8E7;border-radius:12px;padding:16px;text-align:center;">
-        <div style="font-size:11px;font-weight:700;color:#D4920A;margin-bottom:6px;" id="comp-name">المنافس</div>
-        <div style="font-size:28px;font-weight:900;color:#0B1F4E;" id="comp-rating">—</div>
-        <div style="font-size:11px;color:#64748B;" id="comp-total">— تقييم</div>
-      </div>
-    </div>
-    <div id="comp-insights" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
-    <div id="comp-reviews" style="display:none">
-      <div style="font-size:12px;font-weight:700;color:#0B1F4E;margin-bottom:8px;">💬 ما يقوله عملاء المنافس:</div>
-      <div id="comp-pos" style="margin-bottom:8px;"></div>
-    </div>
-  </div>
 </div>
-</div><!-- ── جاسوس المنافسين ── -->
-<div class="sec" id="s-comp" style="display:none">
+<div class="sec" id="s-comp">
   <div class="ph">
     <div>
       <div class="pt">🕵️ جاسوس المنافسين</div>
@@ -568,6 +594,7 @@ async function init() {
   await loadData();
   genQR();
   buildSuggestions();
+  loadAutoReplyToggle();
 
   document.getElementById('ov').style.display = 'none';
 }
@@ -795,6 +822,117 @@ function buildSuggestions() {
   document.getElementById('sugg-list').innerHTML = cards.map(c=>`<div class="sugg ${c.pr}"><div class="sugg-icon ${c.ic}">${c.ico}</div><div style="flex:1"><div class="sugg-t">${c.t}</div><div class="sugg-d">${c.d}</div>${c.a?`<button class="sugg-a" onclick="${c.fn}">← ${c.a}</button>`:''}</div></div>`).join('');
 }
 
+
+// ── Diagnosis ──
+async function runDiagnosis() {
+  const btn = document.getElementById('diag-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التحليل...';
+
+  const rating = parseFloat(document.getElementById('diag-rating').value) || parseFloat(document.getElementById('st-rating')?.textContent) || 0;
+  const total = parseInt(document.getElementById('diag-total').value) || parseInt(document.getElementById('st-total')?.textContent) || 0;
+  const neg = parseInt(document.getElementById('diag-neg').value) || 0;
+  const replyRate = parseInt(document.getElementById('diag-reply-rate').value) || 0;
+  const connected = profile?.google_connected || false;
+
+  // Score each dimension
+  const scores = {
+    rating: rating >= 4.5 ? 95 : rating >= 4 ? 75 : rating >= 3.5 ? 55 : rating >= 3 ? 35 : 15,
+    volume: total >= 100 ? 90 : total >= 50 ? 70 : total >= 20 ? 50 : total >= 5 ? 30 : 10,
+    negHandling: neg === 0 ? 90 : neg <= 2 ? 70 : neg <= 5 ? 50 : 25,
+    replyRate: replyRate >= 75 ? 90 : replyRate >= 50 ? 65 : replyRate >= 25 ? 40 : replyRate > 0 ? 20 : 5,
+    setup: connected ? 85 : 20,
+  };
+
+  const labels = {
+    rating: 'جودة التقييمات',
+    volume: 'حجم التقييمات',
+    negHandling: 'إدارة التقييمات السلبية',
+    replyRate: 'نسبة الرد على التقييمات',
+    setup: 'إعداد المنصة',
+  };
+
+  const colorFn = s => s >= 75 ? '#16A34A' : s >= 50 ? '#D4920A' : '#DC2626';
+  const bgFn = s => s >= 75 ? '#F0FDF4' : s >= 50 ? '#FFF8E7' : '#FEF2F2';
+
+  const scoresHtml = Object.entries(scores).map(([k,v]) => `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
+        <span style="font-weight:700;">${labels[k]}</span>
+        <span style="font-weight:900;color:${colorFn(v)}">${v}/100</span>
+      </div>
+      <div style="background:#F1F5F9;border-radius:20px;height:8px;overflow:hidden;">
+        <div style="width:${v}%;height:100%;background:${colorFn(v)};border-radius:20px;transition:width .8s ease;"></div>
+      </div>
+    </div>
+  `).join('');
+
+  const overall = Math.round(Object.values(scores).reduce((a,b)=>a+b,0) / Object.keys(scores).length);
+  const overallColor = colorFn(overall);
+  const overallBg = bgFn(overall);
+  const overallLabel = overall >= 75 ? 'ممتاز' : overall >= 50 ? 'جيد — يحتاج تحسين' : 'ضعيف — يحتاج اهتمام فوري';
+
+  document.getElementById('diag-scores').innerHTML = `
+    <div style="background:${overallBg};border-radius:10px;padding:14px;text-align:center;margin-bottom:18px;">
+      <div style="font-size:11px;color:${overallColor};font-weight:700;margin-bottom:4px;">التقييم الكلي</div>
+      <div style="font-size:40px;font-weight:900;color:${overallColor};line-height:1;">${overall}</div>
+      <div style="font-size:12px;color:${overallColor};margin-top:4px;">${overallLabel}</div>
+    </div>
+    ${scoresHtml}
+  `;
+
+  // Build action plan
+  const actions = [];
+  if (!connected) actions.push({p:'🔗',t:'اربط Google Business فوراً',d:'بدونه لن تعمل أي ميزة. يأخذ أقل من دقيقة.',u:'high'});
+  if (rating < 4) actions.push({p:'⭐',t:'ركّز على جمع تقييمات جديدة',d:'أرسل QR Code لعملائك الراضين وطلبات واتساب بعد كل خدمة.',u:'high'});
+  if (replyRate < 50) actions.push({p:'💬',t:'ارفع نسبة الرد على التقييمات',d:`نسبة ردك ${replyRate}% فقط. Google تفضّل المشاريع التي تتفاعل مع عملائها.`,u:'high'});
+  if (neg > 3) actions.push({p:'🛡️',t:'فعّل درع التقييمات السلبية',d:'وجّه العملاء غير الراضين لواتساب بدل Google لتقليل التقييمات السلبية.',u:'med'});
+  if (total < 20) actions.push({p:'📨',t:'أرسل طلبات تقييم لعملائك',d:'ابدأ بإرسال 5-10 طلبات يومياً لعملائك الراضين عبر واتساب.',u:'med'});
+  if (scores.replyRate >= 75 && scores.rating >= 4) actions.push({p:'🚀',t:'حسابك في وضع جيد — حافظ على الزخم',d:'الاستمرارية مهمة. الرد اليومي على التقييمات يحافظ على ترتيبك في Google.',u:'low'});
+  if (!actions.length) actions.push({p:'✅',t:'ممتاز! كل شيء على ما يرام',d:'استمر في نفس المستوى وابحث عن منافسيك بأداة الجاسوس.',u:'low'});
+
+  const urgencyColor = {high:'#DC2626',med:'#D4920A',low:'#16A34A'};
+  const urgencyBg = {high:'#FEF2F2',med:'#FFF8E7',low:'#F0FDF4'};
+  const urgencyLabel = {high:'عاجل',med:'مهم',low:'تحسين'};
+
+  document.getElementById('diag-plan').innerHTML = actions.map(a => `
+    <div style="border-radius:10px;padding:12px 14px;margin-bottom:10px;background:${urgencyBg[a.u]};border-right:3px solid ${urgencyColor[a.u]};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:16px;">${a.p}</span>
+        <span style="font-size:13px;font-weight:700;color:${urgencyColor[a.u]};flex:1;">${a.t}</span>
+        <span style="font-size:10px;font-weight:700;color:${urgencyColor[a.u]};background:${urgencyBg[a.u]};border:1px solid ${urgencyColor[a.u]}33;padding:2px 7px;border-radius:20px;">${urgencyLabel[a.u]}</span>
+      </div>
+      <div style="font-size:11px;color:#64748B;line-height:1.6;margin-right:24px;">${a.d}</div>
+    </div>
+  `).join('');
+
+  btn.disabled = false;
+  btn.innerHTML = '🔄 أعد التشخيص';
+  FIVE.toast('✅ اكتمل التشخيص!');
+}
+
+// ── Auto Reply Toggle ──
+async function toggleAutoReply(el) {
+  const plans = ['pro','advanced'];
+  if (!plans.includes(profile?.plan)) {
+    FIVE.toast('⬆️ هذه الميزة للباقة الاحترافية فأعلى','error');
+    return;
+  }
+  el.classList.toggle('on');
+  const enabled = el.classList.contains('on');
+  await sb.from('profiles').update({ auto_reply_enabled: enabled }).eq('id', user.id);
+  if (profile) profile.auto_reply_enabled = enabled;
+  FIVE.toast(enabled ? '✅ الرد التلقائي مفعّل' : '🔕 الرد التلقائي معطّل');
+}
+
+// Load auto-reply toggle state on init
+function loadAutoReplyToggle() {
+  const t = document.getElementById('toggle-auto-reply');
+  if (!t) return;
+  if (profile?.auto_reply_enabled) t.classList.add('on');
+  else t.classList.remove('on');
+}
+
 // Navigation
 function show(name, el) {
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
@@ -812,5 +950,6 @@ init();
 </script>
 </body>
 </html>
+
 
 
