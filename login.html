@@ -79,7 +79,7 @@ async function loginWithGoogle() {
   btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid #ddd;border-top-color:#2251D3;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span> جاري التوجيه...';
   await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
+    options: { redirectTo: window.location.origin + '/login.html' }
   });
 }
 
