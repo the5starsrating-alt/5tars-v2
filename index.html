@@ -199,8 +199,15 @@ footer{background:var(--b);padding:48px 24px 24px;}
 .footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-bottom p{font-size:11px;color:rgba(255,255,255,.3);}
 
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none;margin-right:4px;}
+.hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:.3s;}
+.mobile-nav{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(11,31,78,.98);padding:16px 24px;z-index:99;border-top:1px solid rgba(255,255,255,.1);}
+.mobile-nav a{display:block;color:rgba(255,255,255,.85);font-size:15px;font-weight:600;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);text-decoration:none;}
+.mobile-nav a:last-child{border-bottom:none;margin-top:8px;background:linear-gradient(135deg,#F5B429,#D4920A);color:#0B1F4E!important;text-align:center;border-radius:10px;padding:13px;}
 @media(max-width:900px){
   .nav-links{display:none;}
+  .hamburger{display:flex;}
+  .mobile-nav{display:block;}
   .steps{grid-template-columns:repeat(2,1fr);} .steps::before{display:none;}
   .feat-grid{grid-template-columns:1fr;} .feat.big{grid-column:span 1;}
   .plans{grid-template-columns:1fr;} .plan.pop{transform:none;}
@@ -223,7 +230,18 @@ footer{background:var(--b);padding:48px 24px 24px;}
     <li><a href="/login.html">دخول</a></li>
     <li><a href="/signup.html" class="nav-cta">جرّب مجاناً ←</a></li>
   </ul>
+  <button class="hamburger" id="ham" onclick="toggleMenu()" aria-label="القائمة">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#how">كيف يعمل</a>
+  <a href="#features">المميزات</a>
+  <a href="#pricing">الأسعار</a>
+  <a href="#faq">الأسئلة الشائعة</a>
+  <a href="/login.html">دخول</a>
+  <a href="/signup.html">جرّب مجاناً ←</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -503,6 +521,18 @@ footer{background:var(--b);padding:48px 24px 24px;}
 </footer>
 
 <script>
+function toggleMenu(){
+  var n=document.getElementById('mobile-nav');
+  var h=document.getElementById('ham');
+  var open=n.style.display==='block';
+  n.style.display=open?'none':'block';
+  h.style.opacity=open?'1':'.7';
+}
+document.addEventListener('click',function(e){
+  var n=document.getElementById('mobile-nav');
+  var h=document.getElementById('ham');
+  if(n&&h&&!n.contains(e.target)&&!h.contains(e.target)){n.style.display='none';}
+});
 function toggleFaq(el){
   var item=el.parentElement;
   var isOpen=item.classList.contains('open');
