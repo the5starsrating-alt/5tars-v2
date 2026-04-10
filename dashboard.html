@@ -177,7 +177,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 
 <!-- SIDEBAR -->
 <div class="sb">
-  <div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div>
+  <a href="/" style="text-decoration:none;display:block;"><div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div></a>
   <div class="sb-user">
     <div class="av" id="av">م</div>
     <div class="uname" id="uname">...</div>
@@ -760,7 +760,7 @@ async function syncReviews(data) {
 }
 
 async function aiReply(btn, name, stars, text) {
-  btn.disabled=true; btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التوليد...';
+  btn.disabled=true; btn.innerHTML='⏳ جاري توليد الرد...';
   const r = await FIVE.callEdge('ai-reply',{
     businessName:profile?.full_name||'محلك',
     businessType:profile?.business_type||'restaurant',
