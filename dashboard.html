@@ -177,7 +177,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 
 <!-- SIDEBAR -->
 <div class="sb">
-  <a href="/" style="text-decoration:none;display:block;"><div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div></a>
+  <div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div>
   <div class="sb-user">
     <div class="av" id="av">م</div>
     <div class="uname" id="uname">...</div>
@@ -703,10 +703,7 @@ async function fetchReviews() {
   if (!profile?.google_place_id) { FIVE.toast('أضف رابط Google Business أولاً','error'); return; }
   const btn = document.querySelector('[onclick="fetchReviews()"]');
   btn.disabled=true; btn.textContent='⏳...';
-  const r = await FIVE.callEdge('get-reviews',{
-    mapsUrl: profile.google_place_id,
-    query: profile.full_name || ''
-  });
+  const r = await FIVE.callEdge('get-reviews',{mapsUrl:profile.google_place_id});
   btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-rotate"></i>تحديث من Google';
   if (!r.success) { FIVE.toast('❌ '+(r.error||'فشل الجلب'),'error'); return; }
   await syncReviews(r);
@@ -714,53 +711,20 @@ async function fetchReviews() {
 }
 
 async function syncReviews(data) {
+  await sb.from('reviews').delete().eq('user_id',user.id).eq('source','google');
   if (data.reviews?.length) {
-    // upsert by fingerprint — no delete, preserves replied status and manual edits
-    const rows = data.reviews.map(rv => {
-      const fp = btoa(unescape(encodeURIComponent(
-        (rv.author || '') + '|' + (rv.date || '') + '|' + (rv.stars || 0)
-      ))).slice(0, 40);
-      return {
-        user_id: user.id,
-        author_name: rv.author,
-        review_text: rv.text,
-        stars: Math.min(5, Math.max(1, rv.stars || 3)),
-        review_date: rv.date?.slice(0, 10) || null,
-        source: 'google',
-        fingerprint: fp
-      };
-    });
-
-    const { data: upserted } = await sb.from('reviews')
-      .upsert(rows, { onConflict: 'user_id,fingerprint', ignoreDuplicates: false })
-      .select('id,stars,review_text,tags');
-
-    // Auto-tag reviews that have no tags yet (fire and forget)
-    if (upserted?.length) {
-      const untagged = upserted.filter(r => !r.tags?.length);
-      for (const rv of untagged.slice(0, 5)) { // max 5 per sync to save tokens
-        fetch('/api/tag-review', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reviewId: rv.id, stars: rv.stars, text: rv.review_text, userId: user.id })
-        }).catch(() => {});
-      }
-    }
+    await sb.from('reviews').insert(data.reviews.map(rv=>({
+      user_id:user.id, author_name:rv.author, review_text:rv.text,
+      stars:Math.min(5,Math.max(1,rv.stars||3)), review_date:rv.date?.slice(0,10)||null,
+      replied:false, source:'google'
+    })));
   }
-
-  await sb.from('business_info').upsert({
-    user_id: user.id,
-    avg_rating: data.rating,
-    total_review_count: data.total,
-    google_review_url: profile.google_place_id,
-    updated_at: new Date().toISOString()
-  }, { onConflict: 'user_id' });
-
+  await sb.from('business_info').upsert({user_id:user.id,avg_rating:data.rating,total_review_count:data.total,google_review_url:profile.google_place_id,updated_at:new Date().toISOString()},{onConflict:'user_id'});
   await loadData();
 }
 
 async function aiReply(btn, name, stars, text) {
-  btn.disabled=true; btn.innerHTML='⏳ جاري توليد الرد...';
+  btn.disabled=true; btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التوليد...';
   const r = await FIVE.callEdge('ai-reply',{
     businessName:profile?.full_name||'محلك',
     businessType:profile?.business_type||'restaurant',

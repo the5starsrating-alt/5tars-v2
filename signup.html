@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;direction:rtl;padding:40px 20px;}
+body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px;}
 .card{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:460px;box-shadow:0 32px 80px rgba(0,0,0,.35);}
 .logo{text-align:center;margin-bottom:6px;}
 .logo-txt{font-family:'Tajawal',sans-serif;font-size:36px;font-weight:900;direction:ltr;display:inline-block;}
@@ -41,7 +41,7 @@ input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,21
 </head>
 <body>
 <div class="card">
-  <a href="/" style="text-decoration:none;display:block;"><div class="logo"><div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div></div></a>
+  <div class="logo"><div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div></div>
   <div style="text-align:center;margin-bottom:14px"><span class="badge">🎁 14 يوم مجاناً — بدون بطاقة</span></div>
   <h2>أنشئ حسابك الآن</h2>
   <div class="benefits">
@@ -93,7 +93,7 @@ async function signupWithGoogle() {
   btn.disabled = true;
   await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/login.html' }
+    options: { redirectTo: window.location.origin + '/dashboard.html' }
   });
 }
 

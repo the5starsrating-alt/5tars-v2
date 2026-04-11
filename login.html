@@ -37,12 +37,10 @@ input:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,211,.08);}
 </head>
 <body>
 <div class="card">
-  <a href="/" style="text-decoration:none;display:block;">
-    <div class="logo">
-      <div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div>
-      <span class="logo-sub">★★★★★</span>
-    </div>
-  </a>
+  <div class="logo">
+    <div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div>
+    <span class="logo-sub">★★★★★</span>
+  </div>
   <h2>أهلاً بعودتك 👋</h2>
   <div class="err" id="err"></div>
   <div class="field">
@@ -81,7 +79,7 @@ async function loginWithGoogle() {
   btn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid #ddd;border-top-color:#2251D3;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span> جاري التوجيه...';
   await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/login.html' }
+    options: { redirectTo: window.location.origin + '/dashboard.html' }
   });
 }
 
