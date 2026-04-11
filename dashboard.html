@@ -118,6 +118,15 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 .cbanner .cta{background:linear-gradient(135deg,var(--gold2),var(--gold));color:var(--ink);border:none;border-radius:10px;padding:10px 22px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;cursor:pointer;margin-right:auto;transition:all .2s;white-space:nowrap;}
 .cbanner .cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,146,10,.4);}
 
+/* ── MAPS SETUP BANNER ── */
+.maps-banner{background:#EEF3FF;border:1.5px solid rgba(34,81,211,.2);border-radius:14px;padding:18px 22px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.maps-banner h4{font-size:14px;font-weight:900;color:#0B1F4E;margin-bottom:4px;}
+.maps-banner p{font-size:12px;color:#3B5080;}
+.maps-banner input{flex:1;min-width:200px;padding:10px 14px;border:1.5px solid #E2E8F0;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;text-align:left;}
+.maps-banner input:focus{border-color:var(--blue);}
+.maps-banner button{padding:10px 20px;background:linear-gradient(135deg,#2251D3,#1A3A8F);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.maps-banner button:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(34,81,211,.3);}
+
 /* ── QR ── */
 .qr-wrap{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;}
 .qr-box{background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px;text-align:center;min-width:200px;}
@@ -206,6 +215,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <div><div class="pt">مرحباً، <span id="hname">...</span> 👋</div><div class="ps">ملخص نشاطك على Google Business</div></div>
     <button class="btn bg" onclick="show('qr',document.querySelector('.ni:nth-child(4)'))"><i class="fa-solid fa-qrcode"></i>QR Code</button>
   </div>
+
+  <!-- Maps Setup Banner -->
+  <div id="maps-setup-banner" class="maps-banner" style="display:none;">
+    <div style="flex:1;min-width:200px;">
+      <h4>🔗 اربط حساب Google Business الخاص بك</h4>
+      <p>أدخل رابط صفحتك على Google Maps لجلب التقييمات آلياً</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex:2;min-width:280px;flex-wrap:wrap;">
+      <input type="url" id="maps-url-input" placeholder="https://maps.google.com/... أو https://maps.app.goo.gl/...">
+      <button onclick="saveMapsUrl()">ربط ←</button>
+    </div>
+  </div>
+
   <div id="cbanner" class="cbanner" style="display:none">
     <div style="font-size:40px">🔗</div>
     <div><h3>اربط Google Business</h3><p>لمراقبة تقييماتك والرد عليها آلياً</p></div>
@@ -371,12 +393,9 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
   </div>
 </div>
 
-
 <!-- ── DIAGNOSIS ── -->
 <div class="sec" id="s-diag">
   <div class="ph"><div><div class="pt">🩺 أداة التشخيص</div><div class="ps">أدخل رابط Google Maps لأي مشروع واحصل على تشخيص كامل وخطة تحسين</div></div></div>
-
-  <!-- URL input card -->
   <div class="card" style="margin-bottom:16px;">
     <div class="ct" style="margin-bottom:14px;">🔗 رابط Google Maps للمشروع</div>
     <div class="field" style="margin-bottom:10px;">
@@ -391,8 +410,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     </div>
     <button class="btn bg" id="diag-btn" onclick="runDiagnosis()" style="min-width:200px;">🩺 ابدأ التشخيص الآن</button>
   </div>
-
-  <!-- Results grid -->
   <div id="diag-results-wrap" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
       <div class="card">
@@ -404,8 +421,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
         <div id="diag-plan"></div>
       </div>
     </div>
-
-    <!-- Fetched reviews -->
     <div class="card">
       <div class="ct" style="margin-bottom:14px;">💬 آخر التقييمات المسحوبة من Google</div>
       <div id="diag-reviews-list"></div>
@@ -416,7 +431,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 </div><!-- end main -->
 
 <!-- Google Modal -->
-<div id="g-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;">
+<div id="g-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:18px;padding:28px;max-width:440px;width:90%;direction:rtl;">
     <h3 style="font-family:Cairo;font-size:17px;font-weight:900;color:var(--ink);margin-bottom:14px;">🔗 ربط Google Business</h3>
     <p style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:14px;">افتح Google Maps ← ابحث عن محلك ← اضغط "مشاركة" ← انسخ الرابط</p>
@@ -428,6 +443,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     </div>
   </div>
 </div>
+
+<!-- COMPETITOR SECTION -->
 <div class="sec" id="s-comp">
   <div class="ph">
     <div>
@@ -435,7 +452,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
       <div class="ps">الصق رابط Google Maps لأي منافس — يسحب تقييماته ويقارنها بمشروعك</div>
     </div>
   </div>
-
   <div class="card" style="margin-bottom:16px;">
     <div class="ct" style="margin-bottom:14px;">🔗 رابط Google Maps للمنافس</div>
     <div class="field" style="margin-bottom:10px;">
@@ -449,7 +465,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     </div>
     <button class="btn bg" id="comp-search-btn" onclick="runCompetitorSearch()">🕵️ تحليل المنافس</button>
   </div>
-
   <div id="comp-result" style="display:none">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
       <div style="background:#EEF3FF;border-radius:12px;padding:18px;text-align:center;">
@@ -472,10 +487,28 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
   </div>
 </div>
 
-
 <script>
 let sb, user, profile, _reviews = [];
 
+// ── Save Maps URL from overview banner ──
+async function saveMapsUrl() {
+  const url = document.getElementById('maps-url-input').value.trim();
+  if (!url) { FIVE.toast('أدخل رابط Google Maps', 'error'); return; }
+  if (!url.includes('google') && !url.includes('goo.gl') && !url.includes('maps')) {
+    FIVE.toast('الرابط يبدو غير صحيح — انسخه من Google Maps', 'error'); return;
+  }
+  const { error } = await sb.from('profiles').update({ google_place_id: url, google_connected: true }).eq('id', user.id);
+  if (error) { FIVE.toast('❌ فشل الحفظ', 'error'); return; }
+  profile.google_place_id = url;
+  profile.google_connected = true;
+  document.getElementById('maps-setup-banner').style.display = 'none';
+  document.getElementById('cbanner').style.display = 'none';
+  document.getElementById('g-status').innerHTML = '<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div>';
+  const hint = document.getElementById('diag-autofill-hint');
+  if (hint) hint.style.display = 'inline';
+  FIVE.toast('✅ تم ربط Google Business!');
+  fetchReviews();
+}
 
 // ── shared helper: render review cards ──
 function renderReviewCards(reviews, containerId) {
@@ -509,36 +542,23 @@ async function runCompetitorSearch() {
   if (!url.includes('google') && !url.includes('goo.gl') && !url.includes('maps')) {
     FIVE.toast('الرابط يبدو غير صحيح — انسخه من Google Maps', 'error'); return;
   }
-
   const btn = document.getElementById('comp-search-btn');
   const result = document.getElementById('comp-result');
   const spinner = '<span style="display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px;"></span>';
   btn.disabled = true;
   btn.innerHTML = spinner + ' جاري سحب البيانات...';
   result.style.display = 'none';
-
-  // Use get-reviews API — works with any Google Maps URL
   const r = await FIVE.callEdge('get-reviews', { mapsUrl: url });
-
   btn.disabled = false;
   btn.innerHTML = '🕵️ تحليل المنافس';
-
-  if (!r.success) {
-    FIVE.toast('❌ ' + (r.error || 'تعذّر الوصول — تأكد من الرابط'), 'error');
-    return;
-  }
-
-  // My stats
+  if (!r.success) { FIVE.toast('❌ ' + (r.error || 'تعذّر الوصول — تأكد من الرابط'), 'error'); return; }
   const myRating = parseFloat(document.getElementById('st-rating')?.textContent) || 0;
   const myTotal  = parseInt((document.getElementById('st-total')?.textContent||'0').replace(/\D/g,'')) || 0;
-
   document.getElementById('comp-found-name').textContent  = '🕵️ ' + (r.name||'المنافس').substring(0,22);
   document.getElementById('comp-my-rating').textContent   = myRating ? myRating + ' ⭐' : '—';
   document.getElementById('comp-my-total').textContent    = myTotal  ? myTotal.toLocaleString('ar') + ' تقييم' : '—';
   document.getElementById('comp-their-rating').textContent = (r.rating||0) + ' ⭐';
   document.getElementById('comp-their-total').textContent  = (r.total||0).toLocaleString('ar') + ' تقييم';
-
-  // Insight
   const insight = document.getElementById('comp-insight');
   const theirR = r.rating || 0;
   if (!myRating) {
@@ -557,21 +577,13 @@ async function runCompetitorSearch() {
       insight.textContent = '🟡 نفس التقييم — ركّز على زيادة عدد تقييماتك';
     }
   }
-
-  // Volume + reply gap insights
   const extras = [];
-  if (myRating && r.total > myTotal * 1.5)
-    extras.push(`⚠️ المنافس عنده ${r.total} تقييم — أنت ${myTotal} فقط`);
-  if (myRating && r.total < myTotal)
-    extras.push(`✅ عندك تقييمات أكثر من المنافس بـ ${myTotal - r.total}`);
-
+  if (myRating && r.total > myTotal * 1.5) extras.push(`⚠️ المنافس عنده ${r.total} تقييم — أنت ${myTotal} فقط`);
+  if (myRating && r.total < myTotal) extras.push(`✅ عندك تقييمات أكثر من المنافس بـ ${myTotal - r.total}`);
   document.getElementById('comp-insights-list').innerHTML = extras.map(i =>
     `<div style="background:#F8FAFF;border-radius:8px;padding:10px 12px;font-size:12px;color:#0B1F4E;">${i}</div>`
   ).join('');
-
-  // Reviews
   renderReviewCards(r.reviews, 'comp-reviews-list');
-
   result.style.display = 'block';
   FIVE.toast('✅ تم سحب ' + (r.reviews?.length||0) + ' تقييم من Google');
 }
@@ -581,11 +593,8 @@ async function init() {
   const sess = await FIVE.requireAuth();
   if (!sess) return;
   user = sess.user;
-
   profile = await FIVE.getProfile(user.id);
   if (!profile) { FIVE.toast('تعذّر تحميل بيانات الملف الشخصي','error'); }
-
-  // Fill UI
   const name = profile?.full_name || user.email.split('@')[0];
   document.getElementById('av').textContent    = name.charAt(0).toUpperCase();
   document.getElementById('uname').textContent = name;
@@ -596,29 +605,24 @@ async function init() {
   document.getElementById('s-phone').value = profile?.phone || '';
   if (profile?.business_type) document.getElementById('s-btype').value = profile.business_type;
   if (profile?.full_name) { document.getElementById('qr-name').value = profile.full_name; document.getElementById('fp-biz').textContent = profile.full_name; }
-
   if (profile?.trial_ends) {
     const days = Math.max(0, Math.ceil((new Date(profile.trial_ends) - new Date()) / 86400000));
     document.getElementById('s-trial').textContent = days + ' يوم متبقية';
   }
-
-  if (!profile?.google_connected) document.getElementById('cbanner').style.display = 'flex';
-  // Show hint in diagnosis if saved link exists
+  // Show maps banner if not connected, hide old banner
+  if (!profile?.google_connected) {
+    document.getElementById('maps-setup-banner').style.display = 'flex';
+    document.getElementById('cbanner').style.display = 'none';
+  }
   if (profile?.google_place_id) {
     const hint = document.getElementById('diag-autofill-hint');
     if (hint) hint.style.display = 'inline';
-  }
-  else {
     document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div><div style="font-size:10px;color:var(--muted);margin-top:3px;word-break:break-all">${(profile.google_place_id||'').substring(0,45)}...</div>`;
-    // qr-link لا يُستخدم — الرابط دائماً review.html?uid=
   }
-
-  // Load data
   await loadData();
   genQR();
   buildSuggestions();
   loadAutoReplyToggle();
-
   document.getElementById('ov').style.display = 'none';
 }
 
@@ -633,22 +637,18 @@ async function loadData() {
   ]);
   const bi = biRes.data;
   _reviews = rvRes.data || [];
-
   const total   = bi?.total_review_count ?? _reviews.length;
   const replied = _reviews.filter(r=>r.replied).length;
   const pending = _reviews.length - replied;
   const avg     = bi?.avg_rating || (_reviews.length ? (_reviews.reduce((s,r)=>s+r.stars,0)/_reviews.length).toFixed(1) : 0);
-
   document.getElementById('st-rating').textContent  = avg || '—';
   document.getElementById('st-total').textContent   = total;
   document.getElementById('st-replied').textContent = replied;
   document.getElementById('st-pending').textContent = pending;
   document.getElementById('st-rch').textContent     = avg >= 4.5 ? '🌟 ممتاز' : avg >= 4 ? '👍 جيد' : avg >= 3 ? '⚠️ متوسط' : '—';
   document.getElementById('st-rate').textContent    = _reviews.length ? `نسبة رد ${Math.round(replied/_reviews.length*100)}%` : 'نسبة الرد';
-
   const pb = document.getElementById('pb');
   if (pending > 0) { pb.textContent = pending; pb.style.display = ''; }
-
   renderReviews(_reviews);
   renderRecent(_reviews.slice(0,3));
   loadQrStats();
@@ -724,7 +724,7 @@ async function syncReviews(data) {
 }
 
 async function aiReply(btn, name, stars, text) {
-  btn.disabled=true; btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري التوليد...';
+  btn.disabled=true; btn.innerHTML='<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span> جاري توليد الرد...';
   const r = await FIVE.callEdge('ai-reply',{
     businessName:profile?.full_name||'محلك',
     businessType:profile?.business_type||'restaurant',
@@ -752,7 +752,6 @@ async function waReply(btn, name) {
   else { FIVE.toast('❌ '+(r.error||'فشل'),'error'); btn.disabled=false; btn.textContent='📱 واتساب'; }
 }
 
-// QR
 let _qrObj = null;
 function genQR() {
   const link = window.location.origin + '/review.html?uid=' + (user?.id || '');
@@ -769,7 +768,6 @@ function dlQR() {
   const a = document.createElement('a'); a.download='5tars-qr.png'; a.href=c.toDataURL(); a.click();
 }
 
-// Google modal
 function openGoogleModal() {
   const m = document.getElementById('g-modal');
   m.style.display = 'flex';
@@ -791,15 +789,17 @@ async function saveGoogleLink() {
   btn.disabled=false; btn.textContent='حفظ الرابط';
   if (error) { errEl.textContent='فشل الحفظ: '+error.message; errEl.style.display='block'; return; }
   profile.google_place_id = link; profile.google_connected = true;
+  document.getElementById('maps-setup-banner').style.display = 'none';
   document.getElementById('cbanner').style.display = 'none';
   document.getElementById('g-modal').style.display = 'none';
   document.getElementById('qr-link').value = link;
   document.getElementById('g-status').innerHTML = `<div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-size:12px;font-weight:700;color:var(--green)">تم الربط!</div>`;
+  const hint = document.getElementById('diag-autofill-hint');
+  if (hint) hint.style.display = 'inline';
   genQR();
   FIVE.toast('✅ تم حفظ رابط Google!');
 }
 
-// Filter demo
 function fdemo(t) {
   const el = document.getElementById('fdemo-res');
   el.style.display = 'block';
@@ -807,7 +807,6 @@ function fdemo(t) {
   else { el.innerHTML='💬 <strong>يُوجَّه لرسالتك الخاصة!</strong><br>بدل ما يكتب تقييم سلبي على Google ✅'; el.style.background='#FEF3C7'; el.style.color='#92400E'; }
 }
 
-// Settings
 async function saveSettings() {
   const {error} = await sb.from('profiles').update({
     full_name: document.getElementById('s-name').value,
@@ -826,7 +825,6 @@ async function saveFilter() {
   FIVE.toast('✅ تم حفظ إعدادات الفلتر!');
 }
 
-// Review request
 async function sendRequest() {
   const name  = document.getElementById('rq-name').value.trim();
   let phone   = document.getElementById('rq-phone').value.trim().replace(/[\s\-\(\)+]/g,'');
@@ -849,7 +847,6 @@ async function sendRequest() {
   } else FIVE.toast('❌ فشل الإرسال — تحقق من إعدادات واتساب','error');
 }
 
-// Smart suggestions
 function buildSuggestions() {
   const p = profile||{};
   const cards=[];
@@ -859,43 +856,26 @@ function buildSuggestions() {
   document.getElementById('sugg-list').innerHTML = cards.map(c=>`<div class="sugg ${c.pr}"><div class="sugg-icon ${c.ic}">${c.ico}</div><div style="flex:1"><div class="sugg-t">${c.t}</div><div class="sugg-d">${c.d}</div>${c.a?`<button class="sugg-a" onclick="${c.fn}">← ${c.a}</button>`:''}</div></div>`).join('');
 }
 
-
-// ── shared: show saved link hint for diagnosis ──
 function useSavedLink() {
   const saved = profile?.google_place_id || '';
-  if (saved) {
-    document.getElementById('diag-url').value = saved;
-    runDiagnosis();
-  }
+  if (saved) { document.getElementById('diag-url').value = saved; runDiagnosis(); }
 }
 
-// ── Diagnosis via Google Maps URL ──
 async function runDiagnosis() {
   const urlVal = document.getElementById('diag-url').value.trim();
   const btn = document.getElementById('diag-btn');
   const spinner = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;"></span>';
-
-  // Require a URL
   if (!urlVal) { FIVE.toast('الصق رابط Google Maps أولاً', 'error'); return; }
   if (!urlVal.includes('google') && !urlVal.includes('goo.gl') && !urlVal.includes('maps')) {
     FIVE.toast('الرابط يبدو غير صحيح — انسخه من Google Maps', 'error'); return;
   }
-
   btn.disabled = true;
   btn.innerHTML = spinner + ' جاري سحب البيانات...';
   document.getElementById('diag-results-wrap').style.display = 'none';
-
-  // Fetch from Google via get-reviews API
   const data = await FIVE.callEdge('get-reviews', { mapsUrl: urlVal });
-
   btn.disabled = false;
   btn.innerHTML = '🔄 أعد التشخيص';
-
-  if (!data.success) {
-    FIVE.toast('❌ ' + (data.error || 'تعذّر جلب البيانات — تأكد من الرابط'), 'error');
-    return;
-  }
-
+  if (!data.success) { FIVE.toast('❌ ' + (data.error || 'تعذّر جلب البيانات — تأكد من الرابط'), 'error'); return; }
   const rating = data.rating || 0;
   const total  = data.total  || 0;
   const reviews = data.reviews || [];
@@ -903,8 +883,6 @@ async function runDiagnosis() {
   const repliedCount = reviews.filter(r => r.replied).length;
   const replyRate = reviews.length ? Math.round(repliedCount / reviews.length * 100) : 0;
   const connected = !!urlVal;
-
-  // Score each dimension
   const scores = {
     rating: rating >= 4.5 ? 95 : rating >= 4 ? 75 : rating >= 3.5 ? 55 : rating >= 3 ? 35 : 15,
     volume: total >= 100 ? 90 : total >= 50 ? 70 : total >= 20 ? 50 : total >= 5 ? 30 : 10,
@@ -912,18 +890,9 @@ async function runDiagnosis() {
     replyRate: replyRate >= 75 ? 90 : replyRate >= 50 ? 65 : replyRate >= 25 ? 40 : replyRate > 0 ? 20 : 5,
     setup: connected ? 85 : 20,
   };
-
-  const labels = {
-    rating: 'جودة التقييمات',
-    volume: 'حجم التقييمات',
-    negHandling: 'إدارة التقييمات السلبية',
-    replyRate: 'نسبة الرد على التقييمات',
-    setup: 'إعداد المنصة',
-  };
-
+  const labels = { rating:'جودة التقييمات', volume:'حجم التقييمات', negHandling:'إدارة التقييمات السلبية', replyRate:'نسبة الرد على التقييمات', setup:'إعداد المنصة' };
   const colorFn = s => s >= 75 ? '#16A34A' : s >= 50 ? '#D4920A' : '#DC2626';
   const bgFn = s => s >= 75 ? '#F0FDF4' : s >= 50 ? '#FFF8E7' : '#FEF2F2';
-
   const scoresHtml = Object.entries(scores).map(([k,v]) => `
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">
@@ -935,12 +904,10 @@ async function runDiagnosis() {
       </div>
     </div>
   `).join('');
-
   const overall = Math.round(Object.values(scores).reduce((a,b)=>a+b,0) / Object.keys(scores).length);
   const overallColor = colorFn(overall);
   const overallBg = bgFn(overall);
   const overallLabel = overall >= 75 ? 'ممتاز' : overall >= 50 ? 'جيد — يحتاج تحسين' : 'ضعيف — يحتاج اهتمام فوري';
-
   document.getElementById('diag-scores').innerHTML = `
     <div style="background:${overallBg};border-radius:10px;padding:14px;text-align:center;margin-bottom:18px;">
       <div style="font-size:11px;color:${overallColor};font-weight:700;margin-bottom:4px;">التقييم الكلي</div>
@@ -949,21 +916,17 @@ async function runDiagnosis() {
     </div>
     ${scoresHtml}
   `;
-
-  // Build action plan
   const actions = [];
-  if (!connected) actions.push({p:'🔗',t:'اربط Google Business فوراً',d:'بدونه لن تعمل أي ميزة. يأخذ أقل من دقيقة.',u:'high'});
-  if (rating < 4) actions.push({p:'⭐',t:'ركّز على جمع تقييمات جديدة',d:'أرسل QR Code لعملائك الراضين وطلبات واتساب بعد كل خدمة.',u:'high'});
-  if (replyRate < 50) actions.push({p:'💬',t:'ارفع نسبة الرد على التقييمات',d:`نسبة ردك ${replyRate}% فقط. Google تفضّل المشاريع التي تتفاعل مع عملائها.`,u:'high'});
-  if (neg > 3) actions.push({p:'🛡️',t:'فعّل درع التقييمات السلبية',d:'وجّه العملاء غير الراضين لواتساب بدل Google لتقليل التقييمات السلبية.',u:'med'});
-  if (total < 20) actions.push({p:'📨',t:'أرسل طلبات تقييم لعملائك',d:'ابدأ بإرسال 5-10 طلبات يومياً لعملائك الراضين عبر واتساب.',u:'med'});
-  if (scores.replyRate >= 75 && scores.rating >= 4) actions.push({p:'🚀',t:'حسابك في وضع جيد — حافظ على الزخم',d:'الاستمرارية مهمة. الرد اليومي على التقييمات يحافظ على ترتيبك في Google.',u:'low'});
-  if (!actions.length) actions.push({p:'✅',t:'ممتاز! كل شيء على ما يرام',d:'استمر في نفس المستوى وابحث عن منافسيك بأداة الجاسوس.',u:'low'});
-
+  if (!connected) actions.push({p:'🔗',t:'اربط Google Business فوراً',d:'بدونه لن تعمل أي ميزة.',u:'high'});
+  if (rating < 4) actions.push({p:'⭐',t:'ركّز على جمع تقييمات جديدة',d:'أرسل QR Code لعملائك الراضين.',u:'high'});
+  if (replyRate < 50) actions.push({p:'💬',t:'ارفع نسبة الرد على التقييمات',d:`نسبة ردك ${replyRate}% فقط.`,u:'high'});
+  if (neg > 3) actions.push({p:'🛡️',t:'فعّل درع التقييمات السلبية',d:'وجّه العملاء غير الراضين لواتساب.',u:'med'});
+  if (total < 20) actions.push({p:'📨',t:'أرسل طلبات تقييم لعملائك',d:'ابدأ بـ 5-10 طلبات يومياً.',u:'med'});
+  if (scores.replyRate >= 75 && scores.rating >= 4) actions.push({p:'🚀',t:'حسابك في وضع جيد — حافظ على الزخم',d:'الرد اليومي يحافظ على ترتيبك.',u:'low'});
+  if (!actions.length) actions.push({p:'✅',t:'ممتاز! كل شيء على ما يرام',d:'استمر.',u:'low'});
   const urgencyColor = {high:'#DC2626',med:'#D4920A',low:'#16A34A'};
   const urgencyBg = {high:'#FEF2F2',med:'#FFF8E7',low:'#F0FDF4'};
   const urgencyLabel = {high:'عاجل',med:'مهم',low:'تحسين'};
-
   document.getElementById('diag-plan').innerHTML = actions.map(a => `
     <div style="border-radius:10px;padding:12px 14px;margin-bottom:10px;background:${urgencyBg[a.u]};border-right:3px solid ${urgencyColor[a.u]};">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
@@ -974,22 +937,14 @@ async function runDiagnosis() {
       <div style="font-size:11px;color:#64748B;line-height:1.6;margin-right:24px;">${a.d}</div>
     </div>
   `).join('');
-
   document.getElementById('diag-results-wrap').style.display = 'block';
-
-  // Show pulled reviews
   renderReviewCards(reviews, 'diag-reviews-list');
-
   FIVE.toast('✅ تشخيص ' + (data.name||'المشروع') + ' اكتمل — ' + reviews.length + ' تقييم');
 }
 
-// ── Auto Reply Toggle ──
 async function toggleAutoReply(el) {
   const plans = ['pro','advanced'];
-  if (!plans.includes(profile?.plan)) {
-    FIVE.toast('⬆️ هذه الميزة للباقة الاحترافية فأعلى','error');
-    return;
-  }
+  if (!plans.includes(profile?.plan)) { FIVE.toast('⬆️ هذه الميزة للباقة الاحترافية فأعلى','error'); return; }
   el.classList.toggle('on');
   const enabled = el.classList.contains('on');
   await sb.from('profiles').update({ auto_reply_enabled: enabled }).eq('id', user.id);
@@ -997,7 +952,6 @@ async function toggleAutoReply(el) {
   FIVE.toast(enabled ? '✅ الرد التلقائي مفعّل' : '🔕 الرد التلقائي معطّل');
 }
 
-// Load auto-reply toggle state on init
 function loadAutoReplyToggle() {
   const t = document.getElementById('toggle-auto-reply');
   if (!t) return;
@@ -1005,7 +959,6 @@ function loadAutoReplyToggle() {
   else t.classList.remove('on');
 }
 
-// Navigation
 function show(name, el) {
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
@@ -1015,15 +968,9 @@ function show(name, el) {
   if(btn) btn.classList.add('on');
 }
 
-// Close modal on outside click
 document.getElementById('g-modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
 
 init();
 </script>
 </body>
 </html>
-
-
-
-
-
