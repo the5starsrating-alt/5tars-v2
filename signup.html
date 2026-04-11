@@ -12,6 +12,7 @@
 body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#0B1F4E 0%,#1A3A8F 60%,#0d2660 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;direction:rtl;padding:20px;}
 .card{background:#fff;border-radius:24px;padding:36px;width:100%;max-width:460px;box-shadow:0 32px 80px rgba(0,0,0,.35);}
 .logo{text-align:center;margin-bottom:6px;}
+.logo a{text-decoration:none;display:inline-block;}
 .logo-txt{font-family:'Tajawal',sans-serif;font-size:36px;font-weight:900;direction:ltr;display:inline-block;}
 .l5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
 .lt{color:#0B1F4E;}
@@ -41,7 +42,11 @@ input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,21
 </head>
 <body>
 <div class="card">
-  <div class="logo"><div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div></div>
+  <div class="logo">
+    <a href="/">
+      <div class="logo-txt"><span class="l5">5</span><span class="lt">tars</span></div>
+    </a>
+  </div>
   <div style="text-align:center;margin-bottom:14px"><span class="badge">🎁 14 يوم مجاناً — بدون بطاقة</span></div>
   <h2>أنشئ حسابك الآن</h2>
   <div class="benefits">
@@ -83,54 +88,10 @@ input:focus,select:focus{border-color:#2251D3;box-shadow:0 0 0 3px rgba(34,81,21
   <div class="link">عندك حساب؟ <a href="/login.html">سجّل دخول</a></div>
 </div>
 <script>
-const sb = supabase.createClient('https://bxlvcdfqpkxyrqjdnchi.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U');
-sb.auth.getSession().then(function(r) {
-  if (r.data && r.data.session) window.location.href = '/dashboard.html';
-});
-
-async function signupWithGoogle() {
-  const btn = document.getElementById('btn-google');
-  btn.disabled = true;
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
-  });
-}
-
-async function doSignup() {
-  var name  = document.getElementById('name').value.trim();
-  var phone = document.getElementById('phone').value.trim();
-  var email = document.getElementById('email').value.trim();
-  var pass  = document.getElementById('pass').value;
-  var btype = document.getElementById('btype').value;
-  var err   = document.getElementById('err');
-  var btn   = document.getElementById('btn');
-  err.className = 'err';
-  if (!name||!email||!pass) { err.textContent='الاسم والإيميل وكلمة المرور مطلوبة'; err.className='err show'; return; }
-  if (pass.length<8) { err.textContent='كلمة المرور 8 أحرف على الأقل'; err.className='err show'; return; }
-  btn.disabled=true;
-  btn.innerHTML='جاري التسجيل... <span class="spinner"></span>';
-  var result = await sb.auth.signUp({
-    email: email, password: pass,
-    options: { data: { full_name: name, phone: phone, business_type: btype } }
-  });
-  if (result.error) {
-    var msgs = {'User already registered':'هذا الإيميل مسجّل — <a href="/login.html">سجّل دخول</a>'};
-    err.innerHTML = msgs[result.error.message]||result.error.message;
-    err.className='err show';
-    btn.disabled=false;
-    btn.textContent='ابدأ تجربتي المجانية ←';
-    return;
-  }
-  if (result.data && result.data.session) {
-    window.location.href = '/dashboard.html';
-    return;
-  }
-  err.textContent = 'تم إنشاء الحساب. إذا لم تدخل مباشرة، تحقق من بريدك الإلكتروني ثم سجّل الدخول.';
-  err.className='err show';
-  btn.disabled=false;
-  btn.textContent='ابدأ تجربتي المجانية ←';
-}
+const sb = supabase.createClient('https://bxlvcdfqpkxyrqjdnchi.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4bHZjZGZxcGt4eXJxamRuY2hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1Nzk1MTgsImV4cCI6MjA5MTE1NTUxOH0.sG1TRiia7E6DGAUHLNAakjiLRu3lopDfRNcMB-0kV3U');
+sb.auth.getSession().then(function(r){if(r.data&&r.data.session)window.location.href='/dashboard.html';});
+async function signupWithGoogle(){const btn=document.getElementById('btn-google');btn.disabled=true;await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/dashboard.html'}});}
+async function doSignup(){var name=document.getElementById('name').value.trim();var phone=document.getElementById('phone').value.trim();var email=document.getElementById('email').value.trim();var pass=document.getElementById('pass').value;var btype=document.getElementById('btype').value;var err=document.getElementById('err');var btn=document.getElementById('btn');err.className='err';if(!name||!email||!pass){err.textContent='الاسم والإيميل وكلمة المرور مطلوبة';err.className='err show';return;}if(pass.length<8){err.textContent='كلمة المرور 8 أحرف على الأقل';err.className='err show';return;}btn.disabled=true;btn.innerHTML='جاري التسجيل... <span class="spinner"></span>';var result=await sb.auth.signUp({email:email,password:pass,options:{data:{full_name:name,phone:phone,business_type:btype}}});if(result.error){var msgs={'User already registered':'هذا الإيميل مسجّل — <a href="/login.html">سجّل دخول</a>'};err.innerHTML=msgs[result.error.message]||result.error.message;err.className='err show';btn.disabled=false;btn.textContent='ابدأ تجربتي المجانية ←';return;}if(result.data&&result.data.session){window.location.href='/dashboard.html';return;}err.textContent='تم إنشاء الحساب. إذا لم تدخل مباشرة، تحقق من بريدك الإلكتروني ثم سجّل الدخول.';err.className='err show';btn.disabled=false;btn.textContent='ابدأ تجربتي المجانية ←';}
 </script>
 </body>
 </html>
