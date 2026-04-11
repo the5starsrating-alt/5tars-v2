@@ -186,7 +186,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 
 <!-- SIDEBAR -->
 <div class="sb">
-  <div class="sb-logo"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></div>
+  <div class="sb-logo"><a href="/" style="text-decoration:none;display:block;"><div class="logo-box"><div style="display:flex;align-items:baseline;direction:ltr"><span class="logo-5">5</span><span class="logo-t">tars</span></div><div class="logo-s">★★★★★</div></div></a></div>
   <div class="sb-user">
     <div class="av" id="av">م</div>
     <div class="uname" id="uname">...</div>
@@ -202,6 +202,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <button class="ni" onclick="show('settings',this)"><i class="fa-solid fa-gear fa-fw"></i>الإعدادات</button>
     <button class="ni" onclick="show('comp',this)"><i class="fa-solid fa-magnifying-glass fa-fw"></i>جاسوس المنافسين</button>
     <button class="ni" onclick="show('diag',this)"><i class="fa-solid fa-stethoscope fa-fw"></i>أداة التشخيص</button>
+    <button class="ni" onclick="window.location.href='/finance.html'"><i class="fa-solid fa-crown fa-fw" style="color:var(--gold2)"></i>صفحة المالك</button>
   </div>
   <div class="sb-foot"><button class="logout-btn" onclick="FIVE.signOut()"><i class="fa-solid fa-right-from-bracket"></i>تسجيل الخروج</button></div>
 </div>
@@ -624,6 +625,34 @@ async function init() {
   buildSuggestions();
   loadAutoReplyToggle();
   document.getElementById('ov').style.display = 'none';
+  
+  // إشعار ترحيبي للمستخدم الجديد (أول دخول فقط)
+  checkWelcome();
+}
+
+async function checkWelcome() {
+  const key = 'welcomed_' + (user?.id||'');
+  if (localStorage.getItem(key)) return;
+  const isNew = profile?.created_at && 
+    (new Date() - new Date(profile.created_at)) < 5 * 60 * 1000; // أول 5 دقائق
+  if (isNew) {
+    localStorage.setItem(key, '1');
+    setTimeout(() => {
+      FIVE.toast('🎉 أهلاً ' + (profile?.full_name?.split(' ')[0]||'') + '! حسابك جاهز. ابدأ بربط Google Business 🔗');
+    }, 1500);
+    // أرسل إشعار واتساب لصاحب الموقع
+    try {
+      await FIVE.callEdge('send-whatsapp', {
+        type: 'notification',
+        phone: '966555867232',
+        variables: [
+          (profile?.full_name||user?.email||'عميل جديد') + 
+          ' | ' + (profile?.business_type||'') +
+          ' | ' + (user?.email||'')
+        ]
+      });
+    } catch(e) {}
+  }
 }
 
 function planLabel(p) {
