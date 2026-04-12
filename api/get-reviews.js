@@ -1,13 +1,13 @@
 export const config = { runtime: 'edge' };
 
 async function findPlaceId(query, key) {
-  const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id,name,rating&key=${key}`);
+  const res = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id&key=${key}`);
   const d = await res.json();
   return d.status==='OK' ? d.candidates?.[0]?.place_id : null;
 }
 
 async function getDetails(placeId, key) {
-  const res = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews&language=ar&reviews_sort=newest&key=${key}`);
+  const res = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=name,rating,user_ratings_total,reviews&language=ar&key=${key}`);
   const d = await res.json();
   return d.status==='OK' ? d.result : null;
 }
@@ -18,19 +18,43 @@ function extractId(url) {
   return null;
 }
 
+async function resolveShortUrl(url) {
+  try {
+    const res = await fetch(url, { redirect: 'follow' });
+    return res.url || url;
+  } catch(e) {
+    try {
+      const res = await fetch(url, { redirect: 'manual' });
+      return res.headers.get('location') || url;
+    } catch(e2) { return url; }
+  }
+}
+
 export default async function handler(req) {
   const h = { 'Content-Type':'application/json','Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'POST,OPTIONS' };
   if (req.method==='OPTIONS') return new Response('ok',{headers:h});
-  if (req.method!=='POST') return new Response('Method not allowed',{status:405});
+
   try {
-    const { mapsUrl } = await req.json();
-    if (!mapsUrl) return new Response(JSON.stringify({success:false,error:'mapsUrl required'}),{status:400,headers:h});
+    let { mapsUrl } = await req.json();
     const KEY = process.env.GOOGLE_PLACES_API_KEY;
     if (!KEY) throw new Error('GOOGLE_PLACES_API_KEY not configured');
+
+    // Resolve short URLs (goo.gl, maps.app.goo.gl)
+    if (mapsUrl.includes('goo.gl') || mapsUrl.includes('maps.app')) {
+      mapsUrl = await resolveShortUrl(mapsUrl);
+    }
 
     let placeId = extractId(mapsUrl) || await findPlaceId(mapsUrl, KEY);
     if (!placeId && mapsUrl.includes('maps.google')) {
       try { const q=new URL(mapsUrl).searchParams.get('q'); if(q) placeId=await findPlaceId(q,KEY); } catch{}
+    }
+    // Try extracting place name from URL path
+    if (!placeId) {
+      const nameMatch = mapsUrl.match(/\/place\/([^/]+)/);
+      if (nameMatch) {
+        const placeName = decodeURIComponent(nameMatch[1]).replace(/\+/g, ' ');
+        placeId = await findPlaceId(placeName, KEY);
+      }
     }
     if (!placeId) placeId = await findPlaceId(mapsUrl, KEY);
     if (!placeId) return new Response(JSON.stringify({success:false,error:'Could not find place'}),{status:404,headers:h});
