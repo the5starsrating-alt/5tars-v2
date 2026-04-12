@@ -493,27 +493,33 @@ let sb, user, profile, _reviews = [];
 
 // ── Save Maps URL from overview banner ──
 async function saveMapsUrl(){
-    const url=document.getElementById('maps-url').value.trim();
-    const btn=document.getElementById('save-maps-btn');
-    const err=document.getElementById('maps-error');
-    err.style.display='none';
-    if(!url){err.textContent='\u0623\u062f\u062e\u0644 \u0627\u0644\u0631\u0627\u0628\u0637';err.style.display='block';return;}
-    btn.disabled=true;
-    btn.textContent='\u062c\u0627\u0631\u064a \u0627\u0644\u0631\u0628\u0637...';
+    const urlInput = document.getElementById('maps-url-input');
+    const url = urlInput ? urlInput.value.trim() : '';
+    const btn = event?.target || document.querySelector('.maps-banner button');
+    if(!url){
+      FIVE.toast('\u0623\u062f\u062e\u0644 \u0631\u0627\u0628\u0637 Google Maps','error');
+      return;
+    }
+    if(!url.includes('google') && !url.includes('goo.gl') && !url.includes('maps.app')){
+      FIVE.toast('\u0627\u0644\u0631\u0627\u0628\u0637 \u063a\u064a\u0631 \u0635\u0627\u0644\u062d. \u0623\u062f\u062e\u0644 \u0631\u0627\u0628\u0637 Google Maps.','error');
+      return;
+    }
+    if(btn) { btn.disabled=true; btn.textContent='\u062c\u0627\u0631\u064a \u0627\u0644\u0631\u0628\u0637...'; }
     FIVE.apiCall('get-reviews',{mapsUrl:url}).then(async r=>{
       if(!r.success){
-        err.textContent='\u0644\u0645 \u0646\u062a\u0645\u0643\u0646 \u0645\u0646 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0627\u0644\u0645\u0634\u0631\u0648\u0639';
-        err.style.display='block';
-        btn.disabled=false;btn.textContent='\u062d\u0641\u0638';return;
+        FIVE.toast('\u0644\u0645 \u0646\u062a\u0645\u0643\u0646 \u0645\u0646 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0627\u0644\u0645\u0634\u0631\u0648\u0639. \u062a\u0623\u0643\u062f \u0645\u0646 \u0627\u0644\u0631\u0627\u0628\u0637.','error');
+        if(btn){btn.disabled=false;btn.textContent='\u0631\u0628\u0637 \u2190';}
+        return;
       }
-      await sb.from('profiles').update({google_place_id:r.placeId,google_connected:true,maps_url:url}).eq('id',FIVE.uid);
-      FIVE.toast('\u2705 \u062a\u0645 \u0631\u0628\u0637 '+r.name);
-      btn.disabled=false;btn.textContent='\u062d\u0641\u0638';
-      location.reload();
+      await sb.from('profiles').update({
+        google_place_id: r.placeId, google_connected: true, maps_url: url
+      }).eq('id',FIVE.uid);
+      FIVE.toast('\u2705 \u062a\u0645 \u0631\u0628\u0637 '+r.name+' ('+r.rating+'\u2b50) \u0628\u0646\u062c\u0627\u062d!');
+      if(btn){btn.disabled=false;btn.textContent='\u0631\u0628\u0637 \u2190';}
+      setTimeout(()=>location.reload(),1500);
     }).catch(e=>{
-      err.textContent='\u062e\u0637\u0623: '+e.message;
-      err.style.display='block';
-      btn.disabled=false;btn.textContent='\u062d\u0641\u0638';
+      FIVE.toast('\u062e\u0637\u0623: '+e.message,'error');
+      if(btn){btn.disabled=false;btn.textContent='\u0631\u0628\u0637 \u2190';}
     });
   }
 
