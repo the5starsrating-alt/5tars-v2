@@ -13,6 +13,7 @@ async function getDetails(placeId, key) {
 }
 
 function extractId(url) {
+  if (url.startsWith('ChIJ')) return url;
   const ps = [/[?&]place_id=([^&]+)/,/!1s(ChIJ[^!]+)!/];
   for (const p of ps) { const m=url.match(p); if(m) return m[1]; }
   return null;
