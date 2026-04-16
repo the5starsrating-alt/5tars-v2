@@ -20,7 +20,7 @@
   --muted:#64748B; --sidebar:240px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;overflow-x:hidden;}
 
 /* ── SIDEBAR ── */
 .sb{position:fixed;top:0;right:0;bottom:0;width:var(--sidebar);
@@ -58,7 +58,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 .logout-btn:hover{color:#fff;background:rgba(220,38,38,.2);}
 
 /* ── MAIN ── */
-.main{margin-right:var(--sidebar);min-height:100vh;padding:24px;overflow-y:auto;}
+.main{margin-right:var(--sidebar);min-height:100vh;padding:24px;}
 .sec{display:none;}
 .sec.on{display:block;}
 
@@ -443,7 +443,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
       <button id="g-save-btn" onclick="saveGoogleLink()" style="padding:10px 18px;background:linear-gradient(135deg,var(--blue),var(--ink2));color:#fff;border:none;border-radius:9px;font-family:Cairo;font-weight:700;cursor:pointer;">حفظ الرابط</button>
     </div>
   </div>
-</div>
 
 <!-- COMPETITOR SECTION -->
 <div class="sec" id="s-comp">
@@ -486,6 +485,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
       <div id="comp-reviews-list"></div>
     </div>
   </div>
+</div>
 </div>
 
 <script>
@@ -811,14 +811,33 @@ async function waReply(btn, name) {
 }
 
 let _qrObj = null;
-function genQR() {
-  const link = window.location.origin + '/review.html?uid=' + (user?.id || '');
-  const el = document.getElementById('qrcode');
-  el.innerHTML = '';
+async function genQR() {
   try {
+    // Check if review_link exists for this user
+    let {data: rl} = await sb.from('review_links').select('token').eq('user_id', user.id).single();
+    if (!rl) {
+      // Create a new review_link
+      const tok = Math.random().toString(36).substring(2,14) + Date.now().toString(36);
+      const placeId = profile?.google_place_id || '';
+      const gUrl = placeId ? 'https://search.google.com/local/writereview?placeid=' + placeId : '';
+      const {data: newRl, error} = await sb.from('review_links').insert({
+        user_id: user.id,
+        token: tok,
+        business_name: profile?.full_name || '',
+        google_review_url: gUrl,
+        whatsapp_url: '',
+        negative_message: '',
+        active: true
+      }).select('token').single();
+      if (error) { FIVE.toast('خطأ في إنشاء رابط التقييم','error'); console.error(error); return; }
+      rl = newRl;
+    }
+    const link = window.location.origin + '/review.html?t=' + rl.token;
+    const el = document.getElementById('qrcode');
+    el.innerHTML = '';
     _qrObj = new QRCode(el,{text:link,width:160,height:160,colorDark:'#0B1F4E',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     document.getElementById('qr-url').textContent = link.length>50 ? link.substring(0,50)+'...' : link;
-  } catch(e){}
+  } catch(e){ console.error(e); }
 }
 function dlQR() {
   const c = document.querySelector('#qrcode canvas');
@@ -1037,11 +1056,11 @@ function loadAutoReplyToggle() {
 
 function show(name, el) {
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
-  const sec=document.getElementById('s-'+name);
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  var sec = document.getElementById('s-'+name);
   if(sec) sec.classList.add('on');
-  const btn=el&&el.classList?el:null;
-  if(btn) btn.classList.add('on');
+  if(el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'auto'});
 }
 
 document.getElementById('g-modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
