@@ -25,7 +25,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 /* ── SIDEBAR ── */
 .sb{position:fixed;top:0;right:0;bottom:0;width:var(--sidebar);
   background:linear-gradient(160deg,var(--ink) 0%,var(--ink2) 100%);
-  display:flex;flex-direction:column;z-index:100;overflow-y:auto;}
+  display:flex;flex-direction:column;z-index:100;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;}
+.sb::-webkit-scrollbar{display:none;}
 .sb-logo{padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.08);}
 .logo-box{display:inline-flex;flex-direction:column;align-items:center;
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
