@@ -175,13 +175,40 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 .sugg-a{margin-top:8px;font-size:11px;font-weight:700;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;font-family:'Cairo',sans-serif;}
 .sugg-a:hover{text-decoration:underline;}
 
+/* Mobile hamburger button always hidden on desktop */
+.dash-burger{display:none;position:fixed;top:12px;right:12px;z-index:10000;width:44px;height:44px;border-radius:10px;background:var(--ink);color:#fff;border:none;font-size:20px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.2);}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:998;}
+.sb-overlay.on{display:block;}
 @media(max-width:768px){
-  .sb{display:none;} .main{margin-right:0;padding:14px;}
-  .sgrid{grid-template-columns:repeat(2,1fr);} .sgrid2{grid-template-columns:1fr;}
+  .main{margin-right:0 !important;padding:16px !important;}
+  .sb{transform:translateX(100%);transition:transform .3s ease;z-index:999;}
+  .sb.open{transform:translateX(0);}
+  .dash-burger{display:flex;align-items:center;justify-content:center;}
+  .sgrid{grid-template-columns:repeat(2,1fr);}
+  .sgrid2{grid-template-columns:1fr;}
+  .topbar{padding-right:60px;}
+  .stat-card{padding:14px;}
+  .stat-num{font-size:28px;}
+  .section-title{font-size:18px;}
+  .card{padding:14px;}
+  .btn{padding:10px 14px;font-size:14px;}
+  .rv-item{padding:12px;}
+  .rv-top{flex-wrap:wrap;}
+  input,select,textarea{font-size:16px;}
+  .sgrid3{grid-template-columns:1fr !important;}
+}
+@media(max-width:480px){
+  .sgrid{grid-template-columns:1fr;}
+  .stat-num{font-size:24px;}
+  .main{padding:12px !important;}
+  .rv-item{font-size:13px;}
 }
 </style>
 </head>
 <body>
+<button class="dash-burger" onclick="document.querySelector('.sb').classList.toggle('open');document.querySelector('.sb-overlay').classList.toggle('on')" aria-label="فتح القائمة">☰</button>
+<div class="sb-overlay" onclick="document.querySelector('.sb').classList.remove('open');this.classList.remove('on')"></div>
+
 
 <div class="overlay" id="ov"><div class="overlay-box"><div class="spinner"></div><div style="font-weight:700;color:var(--ink)">جاري التحميل...</div></div></div>
 
@@ -1072,6 +1099,13 @@ function show(name, el) {
   if(sec) sec.classList.add('on');
   if(el) el.classList.add('active');
   window.scrollTo({top:0, behavior:'auto'});
+  // Close sidebar on mobile after navigation
+  if (window.innerWidth <= 768) {
+    var sb = document.querySelector('.sb');
+    var ov = document.querySelector('.sb-overlay');
+    if (sb) sb.classList.remove('open');
+    if (ov) ov.classList.remove('on');
+  }
 }
 
 document.getElementById('g-modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
