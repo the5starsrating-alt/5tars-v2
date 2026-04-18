@@ -904,11 +904,21 @@ function fdemo(t) {
 }
 
 async function saveSettings() {
+  const nameVal = document.getElementById('s-name').value;
+  const phoneVal = document.getElementById('s-phone').value;
+  const btypeVal = document.getElementById('s-btype').value;
   const {error} = await sb.from('profiles').update({
-    full_name: document.getElementById('s-name').value,
-    phone: document.getElementById('s-phone').value,
-    business_type: document.getElementById('s-btype').value
+    full_name: nameVal,
+    phone: phoneVal,
+    business_type: btypeVal
   }).eq('id',user.id);
+  // Sync whatsapp_url into review_links
+  try {
+    let digits = (phoneVal||'').replace(/\D/g,'');
+    if (digits.startsWith('0')) digits = '966' + digits.slice(1);
+    const waUrl = digits ? 'https://wa.me/' + digits : '';
+    await sb.from('review_links').update({ whatsapp_url: waUrl, business_name: nameVal }).eq('user_id', user.id);
+  } catch(_){}
   if (!error) { FIVE.toast('✅ تم الحفظ!'); document.getElementById('uname').textContent = document.getElementById('s-name').value; }
   else FIVE.toast('❌ فشل الحفظ','error');
 }
