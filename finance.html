@@ -136,6 +136,7 @@ tr:hover td{background:var(--bg);}
     <button class="ni" onclick="show('users',this)"><i class="fa-solid fa-users fa-fw"></i>المستخدمون</button>
     <button class="ni" onclick="show('subscriptions',this)"><i class="fa-solid fa-credit-card fa-fw"></i>الاشتراكات</button>
     <button class="ni" onclick="show('expenses',this)"><i class="fa-solid fa-receipt fa-fw"></i>التكاليف</button>
+    <button class="ni" onclick="show('recurring',this)"><i class="fa-solid fa-repeat fa-fw"></i>تكاليف ثابتة</button>
     <button class="ni" onclick="show('ai-costs',this)"><i class="fa-solid fa-robot fa-fw"></i>تكاليف AI</button>
     <button class="ni" onclick="show('ads',this)"><i class="fa-solid fa-bullhorn fa-fw"></i>الإعلانات</button>
     <button class="ni" onclick="show('coupons',this)"><i class="fa-solid fa-tag fa-fw"></i>الكوبونات</button>
@@ -253,7 +254,39 @@ tr:hover td{background:var(--bg);}
   </div>
 </div>
 
-<!-- ── AI COSTS ── -->
+<!-- ── RECURRING COSTS (تكاليف ثابتة شهرية) ── -->
+<div class="sec" id="s-recurring">
+  <div class="ph">
+    <div><div class="pt">🔁 التكاليف الثابتة</div><div class="ps">تكاليف مفاتيح API، الواتساب، الاستضافة، والخدمات المتكررة</div></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn bg" onclick="rolloverRecurring()"><i class="fa-solid fa-download"></i>ترحيل هذا الشهر</button>
+      <button class="btn bp" onclick="openModal('rec-modal')"><i class="fa-solid fa-plus"></i>إضافة تكلفة ثابتة</button>
+    </div>
+  </div>
+  <div class="sgrid" style="grid-template-columns:repeat(4,1fr);">
+    <div class="sc blue"><div class="sc-num" id="rec-total-sar">0</div><div class="sc-label">الإجمالي الشهري (ر.س)</div></div>
+    <div class="sc gold"><div class="sc-num" id="rec-total-usd">$0</div><div class="sc-label">الإجمالي الشهري ($)</div></div>
+    <div class="sc green"><div class="sc-num" id="rec-count">0</div><div class="sc-label">خدمات نشطة</div></div>
+    <div class="sc red"><div class="sc-num" id="rec-yearly">0</div><div class="sc-label">التكلفة السنوية (ر.س)</div></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead><tr><th>الخدمة</th><th>المزود</th><th>الفئة</th><th>المبلغ</th><th>الدورة</th><th>آخر ترحيل</th><th>الحالة</th><th>إجراء</th></tr></thead>
+      <tbody id="rec-table"><tr><td colspan="8" style="text-align:center;padding:30px"><div class="spinner-lg"></div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-top:14px;background:#FFF8E7;border-color:#F5B429;">
+    <div style="display:flex;gap:12px;align-items:flex-start;">
+      <div style="font-size:22px">💡</div>
+      <div style="flex:1;font-size:12px;line-height:1.8;color:#8A5500;">
+        <strong>كيف يعمل الترحيل الشهري؟</strong><br>
+        اضغط "ترحيل هذا الشهر" مرة واحدة شهرياً لنقل كل التكاليف الثابتة النشطة إلى جدول "التكاليف" تلقائياً. الدولار يُحوَّل إلى ريال بسعر 3.75. الخدمات السنوية تُحتسب كـ (المبلغ / 12) شهرياً.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── EXPENSES (انتهى) ── -->
 <div class="sec" id="s-ai-costs">
   <div class="ph"><div><div class="pt">🤖 تكاليف الذكاء الاصطناعي</div><div class="ps">تتبع استهلاك API مفصّل لكل مستخدم</div></div></div>
   <div class="ai-bar">
@@ -334,6 +367,51 @@ tr:hover td{background:var(--bg);}
 </div><!-- end main -->
 
 <!-- MODALS -->
+<!-- Recurring Cost modal -->
+<div class="modal" id="rec-modal">
+  <div class="modal-box">
+    <h3>🔁 تكلفة ثابتة شهرية</h3>
+    <div class="field"><label>اسم الخدمة</label><input type="text" id="rec-name" placeholder="OpenAI API"></div>
+    <div class="field"><label>المزوّد</label><input type="text" id="rec-provider" placeholder="OpenAI"></div>
+    <div class="field"><label>الفئة</label><select id="rec-cat"><option value="hosting">استضافة</option><option value="ai">ذكاء اصطناعي / API</option><option value="whatsapp">واتساب</option><option value="domain">دومين</option><option value="payment">معالجة دفع</option><option value="other">أخرى</option></select></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;">
+      <div class="field"><label>المبلغ</label><input type="number" id="rec-amt" step="0.01" placeholder="50"></div>
+      <div class="field"><label>العملة</label><select id="rec-cur"><option value="SAR">ريال</option><option value="USD">دولار</option></select></div>
+    </div>
+    <div class="field"><label>الدورة</label><select id="rec-cycle"><option value="monthly">شهرية</option><option value="yearly">سنوية</option></select></div>
+    <div class="field"><label>ملاحظات (اختياري)</label><input type="text" id="rec-notes" placeholder="تكلفة متغيرة..."></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn bo" onclick="closeModal('rec-modal')">إلغاء</button>
+      <button class="btn bp" onclick="addRecurring()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Free Grant Subscription modal -->
+<div class="modal" id="grant-modal">
+  <div class="modal-box">
+    <h3>🎁 منح اشتراك مجاني</h3>
+    <div class="field"><label>المستخدم</label><input type="text" id="grant-user-name" disabled style="background:#f8f9fc;color:var(--muted)"></div>
+    <input type="hidden" id="grant-user-id">
+    <div class="field"><label>الباقة</label><select id="grant-plan"><option value="basic">أساسي</option><option value="pro" selected>احترافي</option><option value="advanced">متقدم</option></select></div>
+    <div class="field"><label>المدة</label><select id="grant-duration">
+      <option value="30">شهر واحد</option>
+      <option value="90">3 أشهر</option>
+      <option value="180" selected>6 أشهر</option>
+      <option value="365">سنة كاملة</option>
+      <option value="9999">دائم (لا ينتهي)</option>
+    </select></div>
+    <div class="field"><label>السبب (اختياري)</label><input type="text" id="grant-reason" placeholder="مؤثر / اختبار / تعويض..."></div>
+    <div style="background:#FFF8E7;border:1px solid #F5B429;border-radius:10px;padding:10px 12px;font-size:11px;color:#8A5500;margin-bottom:10px;line-height:1.7;">
+      ⚠️ سيتم تسجيل الاشتراك بمبلغ <strong>0 ر.س</strong> في سجل الاشتراكات، وترقية الباقة فوراً.
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+      <button class="btn bo" onclick="closeModal('grant-modal')">إلغاء</button>
+      <button class="btn bp" onclick="grantFreeSubscription()">منح الآن</button>
+    </div>
+  </div>
+</div>
+
 <!-- Subscription modal -->
 <div class="modal" id="sub-modal">
   <div class="modal-box">
@@ -505,8 +583,9 @@ function renderUsers(rows) {
       <td><span class="badge ${u.status==='active'?'b-active':'b-exp'}">${u.status==='active'?'نشط':'موقوف'}</span></td>
       <td style="font-size:11px">${FIVE.fmtDate(u.created_at)}</td>
       <td style="font-size:11px">${u.trial_ends?FIVE.fmtDate(u.trial_ends):'—'}</td>
-      <td><div style="display:flex;gap:4px;">
-        <button class="btn bp" style="font-size:10px;padding:4px 10px" onclick="grantTrial('${u.id}')">تجربة</button>
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="btn bp" style="font-size:10px;padding:4px 10px" onclick="grantTrial('${u.id}')" title="منح تجربة مجانية">تجربة</button>
+        <button class="btn bg" style="font-size:10px;padding:4px 10px;background:linear-gradient(135deg,#F5B429,#D4920A);color:#fff;border:none;" onclick="openGrantModal('${u.id}','${(u.full_name||u.email||'').replace(/'/g,'&#39;')}')" title="منح اشتراك مجاني كامل">🎁 مجاني</button>
         <button class="btn ${u.status==='active'?'br':'bo'}" style="font-size:10px;padding:4px 10px" onclick="toggleUser('${u.id}','${u.status}')">${u.status==='active'?'إيقاف':'تفعيل'}</button>
       </div></td>
     </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">لا توجد مستخدمون</td></tr>';
@@ -602,6 +681,168 @@ async function delExpense(id) {
   await sb.from('expenses').delete().eq('id',id);
   FIVE.toast('🗑️ تم الحذف'); loadExpenses();
 }
+
+// ── RECURRING COSTS (تكاليف ثابتة) ──
+async function loadRecurring() {
+  const {data, error} = await sb.from('recurring_costs').select('*').order('category').order('name');
+  if (error) { document.getElementById('rec-table').innerHTML='<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--red)">تأكد من تطبيق database_patch_4.sql أولاً</td></tr>'; return; }
+  const rows = data || [];
+  let monthlySar=0, monthlyUsd=0, activeCount=0;
+  rows.forEach(r=>{
+    if (!r.is_active) return;
+    activeCount++;
+    const monthly = r.billing_cycle==='yearly' ? (+r.amount/12) : +r.amount;
+    if (r.currency==='USD') monthlyUsd += monthly; else monthlySar += monthly;
+  });
+  const totalSar = monthlySar + (monthlyUsd * USD_TO_SAR);
+  document.getElementById('rec-total-sar').textContent = FIVE.fmtMoney(totalSar);
+  document.getElementById('rec-total-usd').textContent = '$'+monthlyUsd.toFixed(2);
+  document.getElementById('rec-count').textContent = activeCount;
+  document.getElementById('rec-yearly').textContent = FIVE.fmtMoney(totalSar*12);
+  const catLabels = {hosting:'استضافة',ai:'ذكاء اصطناعي',whatsapp:'واتساب',domain:'دومين',payment:'دفع',other:'أخرى'};
+  const cycleLabels = {monthly:'شهرية',yearly:'سنوية'};
+  document.getElementById('rec-table').innerHTML = rows.length ? rows.map(r=>`
+    <tr>
+      <td><div style="font-weight:700;font-size:12px">${r.name}</div>${r.notes?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${r.notes}</div>`:''}</td>
+      <td style="font-size:11px">${r.provider||'—'}</td>
+      <td><span class="badge b-trial">${catLabels[r.category]||r.category}</span></td>
+      <td style="font-weight:700;color:var(--ink)">${r.currency==='USD'?'$':''}${(+r.amount).toFixed(2)}${r.currency==='SAR'?' ر.س':''}</td>
+      <td style="font-size:11px">${cycleLabels[r.billing_cycle]||r.billing_cycle}</td>
+      <td style="font-size:11px">${r.last_charged_date?FIVE.fmtDate(r.last_charged_date):'<span style="color:var(--muted)">لم يُرحّل</span>'}</td>
+      <td><span class="badge ${r.is_active?'b-active':'b-exp'}">${r.is_active?'نشط':'متوقف'}</span></td>
+      <td><div style="display:flex;gap:4px;">
+        <button class="btn ${r.is_active?'bo':'bp'}" style="font-size:10px;padding:4px 9px" onclick="toggleRecurring('${r.id}',${r.is_active})">${r.is_active?'إيقاف':'تفعيل'}</button>
+        <button class="btn br" style="font-size:10px;padding:4px 9px" onclick="delRecurring('${r.id}')">حذف</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">لا توجد تكاليف ثابتة — اضغط "إضافة تكلفة ثابتة"</td></tr>';
+}
+
+async function addRecurring() {
+  const name = document.getElementById('rec-name').value.trim();
+  const provider = document.getElementById('rec-provider').value.trim();
+  const category = document.getElementById('rec-cat').value;
+  const amount = +document.getElementById('rec-amt').value;
+  const currency = document.getElementById('rec-cur').value;
+  const billing_cycle = document.getElementById('rec-cycle').value;
+  const notes = document.getElementById('rec-notes').value.trim();
+  if (!name) { FIVE.toast('أدخل اسم الخدمة','error'); return; }
+  if (!amount || amount<0) { FIVE.toast('أدخل مبلغاً صحيحاً','error'); return; }
+  const {error} = await sb.from('recurring_costs').insert({
+    name, provider: provider||null, category, amount, currency, billing_cycle,
+    notes: notes||null, is_active: true
+  });
+  if (error) { FIVE.toast('خطأ: '+error.message,'error'); return; }
+  closeModal('rec-modal');
+  ['rec-name','rec-provider','rec-amt','rec-notes'].forEach(id=>document.getElementById(id).value='');
+  FIVE.toast('✅ تم إضافة التكلفة الثابتة!');
+  loadRecurring();
+}
+
+async function toggleRecurring(id, currentActive) {
+  await sb.from('recurring_costs').update({is_active: !currentActive}).eq('id', id);
+  FIVE.toast(currentActive?'⏸️ تم إيقاف الخدمة':'✅ تم تفعيل الخدمة');
+  loadRecurring();
+}
+
+async function delRecurring(id) {
+  if (!confirm('حذف هذه التكلفة الثابتة نهائياً؟')) return;
+  await sb.from('recurring_costs').delete().eq('id', id);
+  FIVE.toast('🗑️ تم الحذف');
+  loadRecurring();
+}
+
+// ترحيل التكاليف الثابتة النشطة إلى جدول expenses للشهر الحالي
+async function rolloverRecurring() {
+  const {data: costs} = await sb.from('recurring_costs').select('*').eq('is_active', true);
+  if (!costs || !costs.length) { FIVE.toast('لا توجد تكاليف نشطة للترحيل','error'); return; }
+  const now = new Date();
+  const monthKey = now.toISOString().slice(0,7); // YYYY-MM
+  const today = now.toISOString().slice(0,10);
+  // تحقق: هل تم ترحيل هذا الشهر من قبل؟
+  const alreadyRolled = costs.filter(c => c.last_charged_date && c.last_charged_date.slice(0,7) === monthKey);
+  if (alreadyRolled.length === costs.length) {
+    if (!confirm('⚠️ تم ترحيل كل التكاليف هذا الشهر بالفعل. هل تريد الترحيل مرة أخرى (سيُنشئ نسخة مكررة)؟')) return;
+  } else if (alreadyRolled.length > 0) {
+    if (!confirm(`${alreadyRolled.length} من ${costs.length} تم ترحيلها هذا الشهر. تريد ترحيل الباقي فقط؟ (اضغط موافق للمتابعة، إلغاء للترحيل الكامل)`)) {
+      // المستخدم اختار إلغاء = ترحيل الكل
+    } else {
+      // ترحيل الباقي فقط
+      costs.splice(0, costs.length, ...costs.filter(c => !c.last_charged_date || c.last_charged_date.slice(0,7) !== monthKey));
+    }
+  }
+  if (!costs.length) { FIVE.toast('لا شيء للترحيل','error'); return; }
+  const expenses = costs.map(c => {
+    const monthly = c.billing_cycle==='yearly' ? (+c.amount/12) : +c.amount;
+    const amountSar = c.currency==='USD' ? monthly*USD_TO_SAR : monthly;
+    return {
+      category: c.category==='payment'?'other':c.category,
+      description: `${c.name}${c.billing_cycle==='yearly'?' (1/12 من سنوي)':''}${c.provider?` - ${c.provider}`:''}`,
+      amount: Number(amountSar.toFixed(2)),
+      expense_date: today
+    };
+  });
+  const {error} = await sb.from('expenses').insert(expenses);
+  if (error) { FIVE.toast('فشل الترحيل: '+error.message,'error'); return; }
+  // حدّث last_charged_date
+  await Promise.all(costs.map(c => sb.from('recurring_costs').update({last_charged_date: today}).eq('id', c.id)));
+  FIVE.toast(`✅ تم ترحيل ${expenses.length} تكلفة إلى هذا الشهر`);
+  loadRecurring();
+  loadExpenses();
+}
+
+// ── FREE GRANT SUBSCRIPTIONS ──
+function openGrantModal(userId, userName) {
+  document.getElementById('grant-user-id').value = userId;
+  document.getElementById('grant-user-name').value = userName;
+  document.getElementById('grant-reason').value = '';
+  openModal('grant-modal');
+}
+
+async function grantFreeSubscription() {
+  const userId = document.getElementById('grant-user-id').value;
+  const plan = document.getElementById('grant-plan').value;
+  const duration = +document.getElementById('grant-duration').value;
+  const reason = document.getElementById('grant-reason').value.trim();
+  if (!userId) { FIVE.toast('لم يُحدَّد المستخدم','error'); return; }
+
+  // تاريخ الانتهاء: null لو دائم (9999)، أو اليوم + المدة
+  const endDate = duration >= 9999 ? null : new Date(Date.now()+duration*86400000).toISOString();
+
+  // 1. أضف اشتراك بقيمة 0 ر.س
+  const {data: sub, error: e1} = await sb.from('subscriptions').insert({
+    user_id: userId,
+    plan: plan,
+    status: 'active',
+    amount: 0,
+    end_date: endDate
+  }).select().single();
+  if (e1) { FIVE.toast('فشل إنشاء الاشتراك: '+e1.message,'error'); return; }
+
+  // 2. حدّث الـ profile
+  const profileUpdate = {plan: plan, status: 'active'};
+  if (endDate) profileUpdate.trial_ends = endDate;
+  else profileUpdate.trial_ends = null;
+  await sb.from('profiles').update(profileUpdate).eq('id', userId);
+
+  // 3. سجّل في free_grants (قد يفشل لو الجدول غير موجود — نتجاهل)
+  try {
+    await sb.from('free_grants').insert({
+      user_id: userId,
+      subscription_id: sub?.id,
+      plan: plan,
+      duration_days: duration,
+      reason: reason || null,
+      granted_by: user.id
+    });
+  } catch(e) { /* جدول free_grants اختياري */ }
+
+  closeModal('grant-modal');
+  const msg = duration >= 9999 ? `🎁 تم منح اشتراك "${plan}" دائم!` : `🎁 تم منح ${duration} يوم من باقة "${plan}"!`;
+  FIVE.toast(msg);
+  loadUsers();
+  loadSubscriptions();
+}
+
 
 // ── AI COSTS ──
 async function loadAiCosts() {
@@ -723,6 +964,7 @@ document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if
 // ── NAV ──
 const loaders={
   'users':loadUsers,'subscriptions':loadSubscriptions,'expenses':loadExpenses,
+  'recurring':loadRecurring,
   'ai-costs':loadAiCosts,'ads':loadAds,'coupons':loadCoupons,'settings-fin':loadFinSettings
 };
 function show(name,el) {
