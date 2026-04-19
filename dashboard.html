@@ -20,7 +20,17 @@
   --muted:#64748B; --sidebar:240px;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;overflow-x:hidden;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direction:rtl;min-height:100vh;overflow-x:hidden;visibility:hidden;}
+body.auth-ready{visibility:visible;}
+/* شاشة تحميل كاملة قبل التحقق من الجلسة */
+#auth-gate{position:fixed;inset:0;background:linear-gradient(160deg,#0B1F4E 0%,#1A3A8F 100%);z-index:999999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;visibility:visible;}
+#auth-gate .ag-logo{font-family:'Tajawal',sans-serif;font-size:38px;font-weight:900;color:#F5B429;letter-spacing:2px;}
+#auth-gate .ag-sp{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:#F5B429;border-radius:50%;animation:agspin .8s linear infinite;}
+#auth-gate .ag-txt{font-size:13px;color:rgba(255,255,255,.7);}
+@keyframes agspin{to{transform:rotate(360deg);}}
+/* زر المالك مخفي افتراضياً حتى يثبت أن المستخدم مالك */
+.owner-only{display:none !important;}
+.owner-only.is-owner{display:flex !important;}
 
 /* ── SIDEBAR ── */
 .sb{position:fixed;top:0;right:0;bottom:0;width:var(--sidebar);
@@ -206,6 +216,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
 </style>
 </head>
 <body>
+<!-- شاشة تحقق الجلسة — تبقى ظاهرة حتى نتأكد من تسجيل الدخول -->
+<div id="auth-gate">
+  <div class="ag-logo">5tars</div>
+  <div class="ag-sp"></div>
+  <div class="ag-txt">جاري التحقق من الجلسة...</div>
+</div>
 <button class="dash-burger" onclick="document.querySelector('.sb').classList.toggle('open');document.querySelector('.sb-overlay').classList.toggle('on')" aria-label="فتح القائمة">☰</button>
 <div class="sb-overlay" onclick="document.querySelector('.sb').classList.remove('open');this.classList.remove('on')"></div>
 
@@ -230,9 +246,9 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--ink);direct
     <button class="ni" onclick="show('settings',this)"><i class="fa-solid fa-gear fa-fw"></i>الإعدادات</button>
     <button class="ni" onclick="show('comp',this)"><i class="fa-solid fa-magnifying-glass fa-fw"></i>جاسوس المنافسين</button>
     <button class="ni" onclick="show('diag',this)"><i class="fa-solid fa-stethoscope fa-fw"></i>أداة التشخيص</button>
-    <button class="ni" onclick="window.location.href='/finance.html'"><i class="fa-solid fa-crown fa-fw" style="color:var(--gold2)"></i>صفحة المالك</button>
+    <button class="ni owner-only" id="nav-owner" onclick="window.location.href='/finance.html'"><i class="fa-solid fa-crown fa-fw" style="color:var(--gold2)"></i>صفحة المالك</button>
   </div>
-  <div class="sb-foot"><button class="logout-btn" onclick="FIVE.signOut()"><i class="fa-solid fa-right-from-bracket"></i>تسجيل الخروج</button></div>
+  <div class="sb-foot"><button class="logout-btn" onclick="doSignOut(event)"><i class="fa-solid fa-right-from-bracket"></i>تسجيل الخروج</button></div>
 </div>
 
 <!-- MAIN -->
@@ -644,6 +660,18 @@ async function init() {
   user = sess.user;
   profile = await FIVE.getProfile(user.id);
   if (!profile) { FIVE.toast('تعذّر تحميل بيانات الملف الشخصي','error'); }
+
+  // ── إظهار زر "صفحة المالك" فقط للمالك ──
+  if (profile && profile.role === 'owner') {
+    const ownerBtn = document.getElementById('nav-owner');
+    if (ownerBtn) ownerBtn.classList.add('is-owner');
+  }
+
+  // ── إظهار الصفحة فقط بعد ثبوت الجلسة ──
+  const gate = document.getElementById('auth-gate');
+  if (gate) gate.remove();
+  document.body.classList.add('auth-ready');
+
   const name = profile?.full_name || user.email.split('@')[0];
   document.getElementById('av').textContent    = name.charAt(0).toUpperCase();
   document.getElementById('uname').textContent = name;
@@ -1109,6 +1137,28 @@ function show(name, el) {
 }
 
 document.getElementById('g-modal').addEventListener('click',function(e){if(e.target===this)this.style.display='none';});
+
+// ── تسجيل خروج موثوق: يمسح الجلسة محلياً ويعيد التوجيه حتى لو فشل Supabase ──
+async function doSignOut(ev){
+  if (ev) ev.preventDefault();
+  const btn = ev && ev.currentTarget;
+  if (btn) { btn.disabled = true; btn.style.opacity='0.6'; }
+  try {
+    // مسح أي بيانات جلسة محلية
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-') || k.includes('supabase') || k.startsWith('welcomed_')) {
+        localStorage.removeItem(k);
+      }
+    });
+    // تسجيل خروج عبر Supabase (مع مهلة قصوى 2 ثانية)
+    await Promise.race([
+      FIVE.getSB().auth.signOut(),
+      new Promise(r => setTimeout(r, 2000))
+    ]);
+  } catch(e) { /* تجاهل أي خطأ — المهم التوجيه */ }
+  window.location.replace('/login.html');
+}
+window.doSignOut = doSignOut;
 
 init();
 </script>
