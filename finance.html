@@ -115,14 +115,29 @@ tr:hover td{background:var(--bg);}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner-lg{width:40px;height:40px;border:4px solid var(--blue-l);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:40px auto;display:block;}
 
+/* ── SIDEBAR MOBILE DRAWER ── */
+.fin-burger{display:none;position:fixed;top:14px;right:14px;z-index:101;width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,#0B1F4E,#1A3A8F);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:0 4px 12px rgba(11,31,78,.25);}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
+.sb-overlay.on{display:block;}
+
 @media(max-width:768px){
-  .sb{display:none;} .main{margin-right:0;padding:14px;}
+  .fin-burger{display:flex;align-items:center;justify-content:center;}
+  .sb{transform:translateX(100%);transition:transform .3s ease;z-index:100;width:260px;}
+  .sb.open{transform:translateX(0);}
+  .main{margin-right:0;padding:14px 14px 14px 14px;padding-top:66px;}
   .sgrid{grid-template-columns:repeat(2,1fr);} .ai-grid{grid-template-columns:repeat(2,1fr);}
   .cp-grid{grid-template-columns:1fr;}
+  .ph{flex-direction:column;align-items:flex-start;gap:10px;}
+  .ph > div:last-child{width:100%;flex-wrap:wrap;}
+  table{font-size:11px;}
+  .tabs{flex-wrap:wrap;}
 }
 </style>
 </head>
 <body>
+
+<button class="fin-burger" onclick="document.querySelector('.sb').classList.toggle('open');document.querySelector('.sb-overlay').classList.toggle('on')" aria-label="فتح القائمة">☰</button>
+<div class="sb-overlay" onclick="document.querySelector('.sb').classList.remove('open');this.classList.remove('on')"></div>
 
 <!-- SIDEBAR -->
 <div class="sb">
@@ -144,7 +159,7 @@ tr:hover td{background:var(--bg);}
   </div>
   <div class="sb-links">
     <div class="sl"><a href="/dashboard.html"><i class="fa-solid fa-arrow-right fa-fw"></i>لوحة المستخدم</a></div>
-    <div class="sl"><a href="#" onclick="FIVE.signOut()"><i class="fa-solid fa-right-from-bracket fa-fw"></i>تسجيل الخروج</a></div>
+    <div class="sl"><a href="#" onclick="doSignOut(event);return false;" style="color:#FCA5A5;"><i class="fa-solid fa-right-from-bracket fa-fw"></i>تسجيل الخروج</a></div>
   </div>
 </div>
 
@@ -974,7 +989,30 @@ function show(name,el) {
   if(sec) sec.classList.add('on');
   if(el&&el.classList) el.classList.add('on');
   if(loaders[name]) loaders[name]();
+  // إغلاق القائمة الجانبية تلقائياً على الموبايل
+  if (window.innerWidth <= 768) {
+    document.querySelector('.sb').classList.remove('open');
+    document.querySelector('.sb-overlay').classList.remove('on');
+  }
 }
+
+// ── SIGN OUT (موثوق — يعيد التوجيه حتى لو فشل Supabase) ──
+async function doSignOut(ev){
+  if (ev) ev.preventDefault();
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith('sb-') || k.includes('supabase') || k.startsWith('welcomed_')) {
+        localStorage.removeItem(k);
+      }
+    });
+    await Promise.race([
+      FIVE.getSB().auth.signOut(),
+      new Promise(r => setTimeout(r, 2000))
+    ]);
+  } catch(e) {}
+  window.location.replace('/login.html');
+}
+window.doSignOut = doSignOut;
 
 // Export
 function exportReport() {
