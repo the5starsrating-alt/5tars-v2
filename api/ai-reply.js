@@ -13,7 +13,7 @@ export default async function handler(req) {
 
     // Rate limit check via Supabase
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
     const dailyLimit = PLAN_LIMITS[plan] || PLAN_LIMITS.trial;
 
     if (userId && SUPABASE_URL && SUPABASE_KEY) {
