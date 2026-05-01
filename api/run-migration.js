@@ -4,7 +4,7 @@ export default async function handler(req) {
   const h = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
 
   const URL  = process.env.SUPABASE_URL;
-  const KEY  = process.env.SUPABASE_SERVICE_KEY;
+  const KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
   if (!URL || !KEY) return new Response(JSON.stringify({error:'not configured'}), {status:500, headers:h});
 
   // Supabase Management API - تشغيل SQL
