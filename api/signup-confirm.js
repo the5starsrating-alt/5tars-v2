@@ -8,7 +8,7 @@ export default async function handler(req) {
   try {
     const { userId, email, full_name, phone, business_type } = await req.json();
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SERVICE_KEY  = process.env.SUPABASE_SERVICE_KEY;
+    const SERVICE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
     if (!SUPABASE_URL || !SERVICE_KEY) throw new Error('Not configured');
 
     // 1. Auto-confirm email
