@@ -825,15 +825,47 @@ async function fetchReviews() {
 }
 
 async function syncReviews(data) {
-  await sb.from('reviews').delete().eq('user_id',user.id).eq('source','google');
+  // 1) Read existing reviews FIRST so we can preserve `replied` state per author+text key
+  const {data: existing} = await sb.from('reviews')
+    .select('author_name,review_text,replied')
+    .eq('user_id', user.id).eq('source','google');
+  const repliedMap = {};
+  (existing||[]).forEach(r => {
+    const k = (r.author_name||'') + '|' + ((r.review_text||'').slice(0,80));
+    if (r.replied) repliedMap[k] = true;
+  });
+
+  // 2) Always update business_info (works even if no reviews returned)
+  await sb.from('business_info').upsert({
+    user_id: user.id,
+    avg_rating: data.rating,
+    total_review_count: data.total,
+    google_review_url: profile.google_place_id,
+    updated_at: new Date().toISOString()
+  }, {onConflict:'user_id'});
+
+  // 3) Only touch reviews table if we actually got fresh reviews back.
+  //    Prevents wiping the table when Google returns a transient empty result.
   if (data.reviews?.length) {
-    await sb.from('reviews').insert(data.reviews.map(rv=>({
-      user_id:user.id, author_name:rv.author, review_text:rv.text,
-      stars:Math.min(5,Math.max(1,rv.stars||3)), review_date:rv.date?.slice(0,10)||null,
-      replied:false, source:'google'
-    })));
+    const rows = data.reviews.map(rv => {
+      const k = (rv.author||'') + '|' + ((rv.text||'').slice(0,80));
+      return {
+        user_id: user.id,
+        author_name: rv.author,
+        review_text: rv.text,
+        stars: Math.min(5, Math.max(1, rv.stars||3)),
+        review_date: rv.date?.slice(0,10) || null,
+        replied: !!repliedMap[k],
+        source: 'google'
+      };
+    });
+    const {error: delErr} = await sb.from('reviews')
+      .delete().eq('user_id', user.id).eq('source','google');
+    if (!delErr) {
+      const {error: insErr} = await sb.from('reviews').insert(rows);
+      if (insErr) console.error('insert reviews failed:', insErr);
+    }
   }
-  await sb.from('business_info').upsert({user_id:user.id,avg_rating:data.rating,total_review_count:data.total,google_review_url:profile.google_place_id,updated_at:new Date().toISOString()},{onConflict:'user_id'});
   await loadData();
 }
 
