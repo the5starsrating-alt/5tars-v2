@@ -20,7 +20,7 @@ export default async function handler(req) {
     }
 
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
     if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Missing env vars');
 
     const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
