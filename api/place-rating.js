@@ -13,19 +13,28 @@ export default async function handler(req) {
     if (!KEY) return new Response(JSON.stringify({ success: false, error: 'Google API not configured' }), { status: 503, headers: h });
 
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&fields=rating,user_ratings_total&key=${KEY}`
+      'https://places.googleapis.com/v1/places/' + encodeURIComponent(place_id),
+      {
+        headers: {
+          'X-Goog-Api-Key': KEY,
+          'X-Goog-FieldMask': 'rating,userRatingCount',
+          'Accept-Language': 'ar'
+        }
+      }
     );
-    const data = await res.json();
 
-    if (data.status !== 'OK') {
-      return new Response(JSON.stringify({ success: false, error: data.status }), { status: 400, headers: h });
+    if (!res.ok) {
+      const t = await res.text();
+      return new Response(JSON.stringify({ success: false, error: `places ${res.status}: ${t.slice(0, 120)}` }), { status: 400, headers: h });
     }
+
+    const data = await res.json();
 
     return new Response(JSON.stringify({
       success: true,
-      rating: data.result.rating ?? null,
-      total: data.result.user_ratings_total ?? null
-    }), { headers: h });
+      rating: data.rating ?? null,
+      total: data.userRatingCount ?? null
+    }), { headers: { ...h, 'Cache-Control': 's-maxage=120, stale-while-revalidate=600' } });
 
   } catch (e) {
     return new Response(JSON.stringify({ success: false, error: e.message }), { status: 500, headers: h });
