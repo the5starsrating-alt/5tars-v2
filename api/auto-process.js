@@ -5,7 +5,7 @@ export default async function handler(req) {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
 
   const SUPABASE_URL  = process.env.SUPABASE_URL;
-  const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
+  const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
   const OPENAI_KEY    = process.env.OPENAI_API_KEY;
   const WA_TOKEN      = process.env.WHATSAPP_TOKEN;
   const WA_URL        = process.env.WHATSAPP_URL;
