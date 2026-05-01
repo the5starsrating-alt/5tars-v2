@@ -27,7 +27,7 @@ export default async function handler(req) {
 
     const OPENAI_KEY = process.env.OPENAI_API_KEY;
     const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
     if (!OPENAI_KEY || !SUPABASE_URL || !SUPABASE_KEY) {
       throw new Error('Missing env vars');
