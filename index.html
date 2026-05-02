@@ -1,64 +1,42 @@
-جيد — `signup.html` له هيكل مشابه لـ `login.html`. يكفي. الآن لدي كل ما أحتاجه. سأعطيك الملفات الجاهزة.
-
----
-
-# 🚀 النسخ المحسّنة — استبدل الملفات في GitHub
-
-## 📁 الملف 1: `index.html` (جديد كلياً — احترافي)
-
-افتح `index.html` في GitHub → اضغط ✏️ (Edit) → احذف كل المحتوى → الصق هذا:
-
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
-<!-- Primary SEO -->
 <title>5tars — ارفع تقييم مشروعك على Google آلياً | المنصة العربية الأولى</title>
-<meta name="description" content="5tars هي المنصة العربية الأولى لإدارة تقييمات Google للمطاعم والصالونات والعيادات في السعودية والخليج. ردود ذكية بالعربي، تنبيهات واتساب فورية، QR ذكي. جرّب 14 يوم مجاناً بدون بطاقة.">
-<meta name="keywords" content="إدارة تقييمات Google, تقييمات جوجل السعودية, ردود تلقائية عربية, تحسين تقييم المطعم, منصة تقييمات الخليج">
+<meta name="description" content="منصة عربية لإدارة تقييمات Google للمطاعم والصالونات والعيادات في السعودية والخليج. ردود ذكية بالعربي، تنبيهات واتساب فورية، QR ذكي. 14 يوم مجاناً بدون بطاقة.">
+<meta name="keywords" content="إدارة تقييمات جوجل, تقييمات Google السعودية, ردود تلقائية بالعربي, تحسين تقييم المطعم, منصة تقييمات الخليج">
 <meta name="author" content="5tars">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#0B1F4E">
 <link rel="canonical" href="https://www.the5starsrating.com/">
 
-<!-- Open Graph -->
 <meta property="og:site_name" content="5tars">
 <meta property="og:locale" content="ar_SA">
 <meta property="og:title" content="5tars — ارفع تقييم مشروعك على Google آلياً">
 <meta property="og:description" content="المنصة العربية الأولى لإدارة تقييمات Google. ردود ذكية بالعربي، تنبيهات واتساب، QR ذكي. 14 يوم مجاناً.">
 <meta property="og:url" content="https://www.the5starsrating.com/">
 <meta property="og:type" content="website">
-<meta property="og:image" content="https://www.the5starsrating.com/og-cover.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image" content="https://www.the5starsrating.com/og-cover.svg">
 
-<!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="5tars — ارفع تقييم مشروعك على Google آلياً">
 <meta name="twitter:description" content="المنصة العربية الأولى لإدارة تقييمات Google. 14 يوم مجاناً.">
-<meta name="twitter:image" content="https://www.the5starsrating.com/og-cover.png">
+<meta name="twitter:image" content="https://www.the5starsrating.com/og-cover.svg">
 
-<!-- Structured Data -->
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "5tars",
-  "description": "المنصة العربية الأولى لإدارة تقييمات Google آلياً للمشاريع السعودية والخليجية",
-  "url": "https://www.the5starsrating.com",
-  "applicationCategory": "BusinessApplication",
-  "inLanguage": "ar",
-  "offers": {
-    "@type": "AggregateOffer",
-    "lowPrice": "49",
-    "highPrice": "199",
-    "priceCurrency": "SAR"
-  },
-  "operatingSystem": "Web"
+  "@context":"https://schema.org",
+  "@type":"SoftwareApplication",
+  "name":"5tars",
+  "description":"منصة عربية لإدارة تقييمات Google آلياً للمشاريع السعودية والخليجية",
+  "url":"https://www.the5starsrating.com",
+  "applicationCategory":"BusinessApplication",
+  "inLanguage":"ar",
+  "operatingSystem":"Web",
+  "offers":{"@type":"AggregateOffer","lowPrice":"49","highPrice":"299","priceCurrency":"SAR"}
 }
 </script>
 
@@ -67,201 +45,224 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
 
 <style>
-:root{--b:#0B1F4E;--b2:#1A3A8F;--b3:#2251D3;--b4:#EEF3FF;--g:#D4920A;--g2:#F5B429;--white:#fff;--muted:#7A90BB;--border:rgba(34,81,211,.1);}
-*{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{font-family:'Cairo',sans-serif;background:#fff;color:var(--b);direction:rtl;overflow-x:hidden;}
-.container{max-width:1100px;margin:0 auto;padding:0 24px;}
+:root{
+  --b:#0B1F4E;--b2:#1A3A8F;--b3:#2251D3;--b4:#EEF3FF;
+  --g:#D4920A;--g2:#F5B429;--g3:#FFE08A;
+  --white:#fff;--ink:#0B1F4E;--muted:#7A90BB;--text:#3B5080;
+  --border:rgba(34,81,211,.1);--soft:#F8FAFF;
+  --shadow-sm:0 4px 12px rgba(11,31,78,.06);
+  --shadow-md:0 12px 32px rgba(11,31,78,.10);
+  --shadow-lg:0 24px 60px rgba(11,31,78,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Cairo',sans-serif;background:#fff;color:var(--ink);direction:rtl;overflow-x:hidden;line-height:1.6;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;background:rgba(11,31,78,.97);backdrop-filter:blur(20px);}
-.nav-logo{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;direction:ltr;text-decoration:none;}
-.n5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic;}
-.nt{color:#fff;}
-.nav-links{display:flex;align-items:center;gap:24px;list-style:none;}
-.nav-links a{color:rgba(255,255,255,.75);font-size:13px;font-weight:600;text-decoration:none;transition:.2s;}
-.nav-links a:hover{color:var(--g2);}
-.nav-cta{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--b)!important;padding:9px 20px;border-radius:10px;font-weight:900!important;}
-.nav-toggle{display:none;background:transparent;border:0;color:#fff;font-size:26px;cursor:pointer;padding:4px 10px;}
+/* ==== NAV ==== */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:12px 24px;background:rgba(11,31,78,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.06);transition:.25s}
+.nav-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.nav-logo{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;direction:ltr;line-height:1}
+.n5{background:linear-gradient(180deg,#FFF0A0,#F5B429,#8A5500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:italic}
+.nt{color:#fff}
+.nav-links{display:flex;align-items:center;gap:26px;list-style:none}
+.nav-links a{color:rgba(255,255,255,.78);font-size:13.5px;font-weight:600;transition:.2s;position:relative}
+.nav-links a:hover{color:var(--g2)}
+.nav-cta{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--ink)!important;padding:9px 20px;border-radius:10px;font-weight:900!important;box-shadow:0 6px 20px rgba(245,180,41,.25)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(245,180,41,.4)}
+.nav-toggle{display:none;background:transparent;border:0;color:#fff;font-size:24px;cursor:pointer;padding:6px 10px;border-radius:8px}
 
-/* HERO */
-.hero{min-height:100vh;background:linear-gradient(155deg,var(--b) 0%,var(--b2) 55%,#1E4EC4 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:100px 24px 80px;position:relative;overflow:hidden;}
-.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(34,81,211,.35) 0%,transparent 65%);pointer-events:none;}
-.hero::after{content:'';position:absolute;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(212,146,10,.12) 0%,transparent 65%);pointer-events:none;}
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;}
-.hero-inner{position:relative;z-index:1;max-width:820px;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.9);font-size:12px;font-weight:700;padding:7px 18px;border-radius:40px;margin-bottom:28px;}
-.hero-badge .dot{width:7px;height:7px;background:var(--g2);border-radius:50%;animation:pulse 2s infinite;}
+/* ==== HERO ==== */
+.hero{min-height:100vh;background:linear-gradient(155deg,var(--b) 0%,var(--b2) 55%,#1E4EC4 100%);display:flex;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(34,81,211,.4) 0%,transparent 65%);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-150px;left:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(245,180,41,.13) 0%,transparent 65%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%)}
+.hero-inner{position:relative;z-index:1;max-width:840px;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.92);font-size:12.5px;font-weight:700;padding:8px 18px;border-radius:40px;margin-bottom:28px;backdrop-filter:blur(10px)}
+.hero-badge .dot{width:7px;height:7px;background:var(--g2);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 8px var(--g2)}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-h1{font-family:'Tajawal',sans-serif;font-size:clamp(32px,6vw,64px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:20px;}
-h1 em{font-style:normal;background:linear-gradient(135deg,var(--g2),#FFE08A);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.hero-sub{font-size:clamp(15px,2vw,17px);color:rgba(255,255,255,.7);line-height:1.8;max-width:560px;margin:0 auto 32px;}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
-.btn-hero{padding:15px 32px;border-radius:14px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;border:none;transition:all .25s;}
-.btn-gold{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--b);box-shadow:0 8px 32px rgba(212,146,10,.45);}
-.btn-gold:hover{transform:translateY(-3px);box-shadow:0 14px 44px rgba(212,146,10,.55);}
-.btn-ghost{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.25);}
-.btn-ghost:hover{background:rgba(255,255,255,.18);}
-.hero-trust{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:36px;}
-.hero-stats{display:flex;gap:0;justify-content:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:18px;overflow:hidden;max-width:560px;margin:0 auto;}
-.hstat{flex:1;padding:18px 14px;text-align:center;border-left:1px solid rgba(255,255,255,.07);}
-.hstat:last-child{border-left:none;}
-.hstat-n{font-family:'Tajawal',sans-serif;font-size:24px;font-weight:900;color:var(--g2);line-height:1;margin-bottom:4px;}
-.hstat-l{font-size:10px;color:rgba(255,255,255,.5);line-height:1.4;}
+h1{font-family:'Tajawal',sans-serif;font-size:clamp(34px,6vw,68px);font-weight:900;color:#fff;line-height:1.15;margin-bottom:22px;letter-spacing:-.5px}
+h1 em{font-style:normal;background:linear-gradient(135deg,var(--g2) 0%,var(--g3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block}
+.hero-sub{font-size:clamp(15px,2vw,18px);color:rgba(255,255,255,.78);line-height:1.85;max-width:600px;margin:0 auto 36px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.btn-hero{padding:16px 34px;border-radius:14px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:900;cursor:pointer;border:none;transition:all .25s;display:inline-flex;align-items:center;gap:8px}
+.btn-gold{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--ink);box-shadow:0 12px 32px rgba(245,180,41,.35)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(245,180,41,.5)}
+.btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.2);backdrop-filter:blur(10px)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);transform:translateY(-2px)}
+.hero-trust{font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:50px;max-width:760px;margin-left:auto;margin-right:auto}
+.hstat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:18px 12px;backdrop-filter:blur(10px)}
+.hstat-n{font-family:'Tajawal',sans-serif;font-size:clamp(20px,3vw,26px);font-weight:900;color:var(--g2);margin-bottom:4px;line-height:1.1}
+.hstat-l{font-size:11px;color:rgba(255,255,255,.65);line-height:1.4;font-weight:600}
 
-/* LOGOS */
-.proof{background:#F5F8FF;padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;}
-.proof-item{font-size:12px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px;}
-.proof-sep{width:1px;height:14px;background:var(--border);}
+/* ==== PROOF STRIP ==== */
+.proof{background:#fff;border-bottom:1px solid var(--border);padding:22px 24px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:18px}
+.proof-item{font-size:13px;font-weight:700;color:var(--text);display:inline-flex;align-items:center;gap:6px}
+.proof-sep{width:4px;height:4px;background:var(--muted);opacity:.4;border-radius:50%}
 
-/* HOW */
-.how{padding:88px 0;background:#fff;text-align:center;}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--b4);color:var(--b3);border:1px solid rgba(34,81,211,.15);font-size:11px;font-weight:800;letter-spacing:2px;padding:5px 16px;border-radius:40px;margin-bottom:14px;}
-.sec-title{font-family:'Tajawal',sans-serif;font-size:clamp(26px,4vw,40px);font-weight:900;color:var(--b);margin-bottom:12px;}
-.sec-title span{color:var(--b3);}
-.sec-sub{font-size:15px;color:var(--muted);line-height:1.8;max-width:520px;margin:0 auto;}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:52px;position:relative;}
-.steps::before{content:'';position:absolute;top:36px;right:12.5%;left:12.5%;height:2px;background:linear-gradient(90deg,var(--b3),var(--g2));z-index:0;}
-.step{padding:0 14px;position:relative;z-index:1;}
-.step-c{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--b3),var(--b2));color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(34,81,211,.3);transition:.3s;}
-.step:hover .step-c{transform:scale(1.1);}
-.step-n{position:absolute;top:-6px;right:calc(50% - 40px);width:18px;height:18px;background:var(--g2);color:var(--b);border-radius:50%;font-size:9px;font-weight:900;display:flex;align-items:center;justify-content:center;}
-.step-t{font-size:13px;font-weight:800;margin-bottom:6px;}
-.step-d{font-size:12px;color:var(--muted);line-height:1.7;}
+/* ==== SECTIONS COMMON ==== */
+section{padding:90px 0;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--b4);color:var(--b3);font-size:12px;font-weight:800;padding:6px 16px;border-radius:30px;margin-bottom:16px}
+.sec-title{font-family:'Tajawal',sans-serif;font-size:clamp(28px,4.5vw,42px);font-weight:900;line-height:1.2;margin-bottom:14px;letter-spacing:-.3px}
+.sec-title span{background:linear-gradient(135deg,var(--b3),var(--b2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sec-sub{font-size:16px;color:var(--text);max-width:620px;line-height:1.8}
+.sec-head{text-align:center;margin-bottom:60px}
+.sec-head .sec-sub{margin-left:auto;margin-right:auto}
 
-/* FEATURES */
-.features{padding:88px 0;background:#F5F8FF;text-align:center;}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px;}
-.feat{background:#fff;border:1px solid var(--border);border-radius:18px;padding:26px 22px;text-align:right;transition:all .3s;box-shadow:0 2px 12px rgba(11,31,78,.06);}
-.feat:hover{transform:translateY(-5px);box-shadow:0 12px 36px rgba(11,31,78,.1);border-color:rgba(34,81,211,.2);}
-.feat.big{grid-column:span 2;background:linear-gradient(135deg,var(--b),var(--b2));color:#fff;border-color:transparent;}
-.feat-ico{width:46px;height:46px;border-radius:11px;background:var(--b4);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;transition:.3s;}
-.feat:hover .feat-ico{transform:scale(1.1) rotate(-4deg);}
-.feat.big .feat-ico{background:rgba(255,255,255,.12);}
-.feat-t{font-size:14px;font-weight:800;margin-bottom:6px;}
-.feat.big .feat-t{color:#fff;}
-.feat-d{font-size:12px;color:var(--muted);line-height:1.75;}
-.feat.big .feat-d{color:rgba(255,255,255,.65);}
-.feat-tag{display:inline-block;margin-top:10px;background:rgba(245,180,41,.15);color:var(--g2);border:1px solid rgba(245,180,41,.3);font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;}
+/* ==== HOW IT WORKS ==== */
+.how{background:linear-gradient(180deg,#fff 0%,var(--soft) 100%)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:24px}
+.step{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px 22px;position:relative;transition:.25s}
+.step:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(34,81,211,.25)}
+.step-n{position:absolute;top:-14px;right:22px;width:36px;height:36px;background:linear-gradient(135deg,var(--g2),var(--g));color:var(--ink);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-weight:900;font-size:16px;box-shadow:0 6px 18px rgba(245,180,41,.35)}
+.step-icon{font-size:28px;margin-bottom:14px;margin-top:6px}
+.step h3{font-family:'Tajawal',sans-serif;font-size:18px;font-weight:900;color:var(--ink);margin-bottom:8px}
+.step p{font-size:13.5px;color:var(--text);line-height:1.7}
 
-/* PRICING */
-.pricing{padding:88px 0;background:#fff;text-align:center;}
-.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px;align-items:start;}
-.plan{background:linear-gradient(155deg,var(--b2) 0%,var(--b3) 100%);border:2px solid rgba(255,255,255,.1);border-radius:20px;padding:30px 24px;color:#fff;text-align:right;transition:all .3s;}
-.plan:hover{transform:translateY(-5px);box-shadow:0 20px 52px rgba(26,58,143,.4);}
-.plan.pop{background:linear-gradient(155deg,var(--b) 0%,#1A3A8F 100%);border:3px solid var(--g2);box-shadow:0 20px 60px rgba(212,146,10,.28);transform:scale(1.04);}
-.plan.pop:hover{transform:scale(1.04) translateY(-5px);}
-.pop-badge{text-align:center;margin-bottom:16px;}
-.pop-badge span{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--b);padding:4px 18px;border-radius:40px;font-size:11px;font-weight:900;}
-.plan-name{font-size:11px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:2px;margin-bottom:14px;}
-.plan-price{font-family:'Tajawal',sans-serif;font-size:50px;font-weight:900;color:#fff;line-height:1;margin-bottom:2px;}
-.plan.pop .plan-price{background:linear-gradient(135deg,#FFE08A,var(--g2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.plan-curr{font-size:14px;font-weight:700;color:rgba(255,255,255,.5);vertical-align:middle;margin-right:3px;}
-.plan-period{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;}
-.plan-justify{font-size:11px;color:rgba(255,255,255,.6);margin-bottom:16px;line-height:1.5;font-style:italic;}
-.plan-div{height:1px;background:rgba(255,255,255,.1);margin-bottom:16px;}
-.plan-feats{list-style:none;margin-bottom:24px;display:flex;flex-direction:column;gap:9px;}
-.plan-feats li{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.8);}
-.plan-feats li::before{content:'✓';width:16px;height:16px;flex-shrink:0;background:rgba(255,255,255,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;}
-.plan-feats li.off{color:rgba(255,255,255,.25);}
-.plan-feats li.off::before{content:'✕';}
-.plan-btn{width:100%;padding:12px;border-radius:11px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:900;cursor:pointer;border:none;transition:all .25s;}
-.plan-btn-outline{background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:#fff;}
-.plan-btn-outline:hover{background:rgba(255,255,255,.2);}
-.plan-btn-gold{background:linear-gradient(135deg,var(--g2),var(--g));color:var(--b);box-shadow:0 6px 20px rgba(212,146,10,.4);}
-.plan-btn-gold:hover{transform:scale(1.02);}
+/* ==== FEATURES ==== */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.feat{background:#fff;border:1px solid var(--border);border-radius:20px;padding:32px 26px;transition:.25s}
+.feat:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(34,81,211,.25)}
+.feat-icon{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--b4),#fff);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px;border:1px solid var(--border)}
+.feat h3{font-family:'Tajawal',sans-serif;font-size:19px;font-weight:900;color:var(--ink);margin-bottom:10px}
+.feat p{font-size:14px;color:var(--text);line-height:1.75}
+.feat-tag{display:inline-block;font-size:10.5px;font-weight:800;color:var(--b3);background:var(--b4);padding:3px 10px;border-radius:20px;margin-top:14px;letter-spacing:.3px}
 
-/* ABOUT */
-.about{padding:88px 0;background:#F5F8FF;}
-.about-inner{display:grid;grid-template-columns:1fr 2fr;gap:48px;align-items:center;max-width:860px;margin:0 auto;}
-.about-avatar{width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,var(--b3),var(--b2));display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#fff;margin:0 auto;box-shadow:0 16px 48px rgba(34,81,211,.25);}
-.about-text h2{font-family:'Tajawal',sans-serif;font-size:28px;font-weight:900;color:var(--b);margin-bottom:8px;}
-.about-text .about-role{font-size:13px;color:var(--b3);font-weight:700;margin-bottom:16px;}
-.about-text p{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:12px;}
-.about-badges{display:flex;gap:8px;flex-wrap:wrap;}
-.about-badge{background:#fff;color:var(--b3);border:1px solid rgba(34,81,211,.15);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+/* ==== COMPARISON ==== */
+.compare{background:linear-gradient(180deg,var(--soft) 0%,#fff 100%)}
+.compare-table{max-width:880px;margin:0 auto;background:#fff;border-radius:24px;overflow:hidden;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
+.ct-row{display:grid;grid-template-columns:1.4fr 1fr 1fr;align-items:center}
+.ct-row:not(:last-child){border-bottom:1px solid var(--border)}
+.ct-row.head{background:linear-gradient(135deg,var(--b),var(--b2));color:#fff}
+.ct-cell{padding:18px 22px;font-size:14px}
+.ct-cell.title{font-weight:700;color:var(--ink)}
+.ct-row.head .ct-cell{font-family:'Tajawal',sans-serif;font-weight:900;font-size:15px;text-align:center}
+.ct-row.head .ct-cell:first-child{text-align:right;font-size:13px}
+.ct-cell.us{background:rgba(245,180,41,.06);text-align:center;font-weight:700;color:var(--ink);position:relative}
+.ct-cell.them{text-align:center;color:var(--muted);font-weight:600}
+.ct-yes{color:#16a34a;font-weight:900;font-size:16px}
+.ct-no{color:#dc2626;font-weight:900;font-size:16px}
 
-/* FAQ */
-.faq{padding:88px 0;background:#fff;}
-.faq-list{max-width:720px;margin:48px auto 0;display:flex;flex-direction:column;gap:0;}
-.faq-item{background:#F9FBFF;border:1px solid var(--border);border-bottom:none;}
-.faq-item:first-child{border-radius:16px 16px 0 0;}
-.faq-item:last-child{border-radius:0 0 16px 16px;border-bottom:1px solid var(--border);}
-.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;cursor:pointer;font-size:14px;font-weight:700;color:var(--b);user-select:none;gap:12px;}
-.faq-q:hover{background:var(--b4);}
-.faq-icon{width:22px;height:22px;border-radius:50%;background:var(--b4);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--b3);flex-shrink:0;transition:.25s;}
-.faq-item.open .faq-icon{transform:rotate(45deg);background:var(--b3);color:#fff;}
-.faq-a{display:none;padding:0 22px 18px;font-size:13px;color:var(--muted);line-height:1.8;}
-.faq-item.open .faq-a{display:block;}
+/* ==== TESTIMONIALS ==== */
+.tests-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.test{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px;position:relative;transition:.25s}
+.test:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.test-stars{color:var(--g2);font-size:16px;margin-bottom:14px;letter-spacing:2px}
+.test-quote{font-size:14.5px;color:var(--text);line-height:1.85;margin-bottom:20px}
+.test-author{display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid var(--border)}
+.test-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--b3),var(--b2));color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-weight:900;font-size:16px}
+.test-name{font-weight:800;font-size:14px;color:var(--ink);line-height:1.2;margin-bottom:3px}
+.test-role{font-size:12px;color:var(--muted)}
 
-/* CTA */
-.cta{padding:88px 0;background:linear-gradient(155deg,var(--b) 0%,var(--b2) 100%);text-align:center;position:relative;overflow:hidden;}
-.cta::before{content:'★★★★★';position:absolute;font-size:160px;color:rgba(255,255,255,.02);top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;pointer-events:none;}
-.cta-t{font-family:'Tajawal',sans-serif;font-size:clamp(24px,4vw,42px);font-weight:900;color:#fff;margin-bottom:12px;}
-.cta-t em{font-style:normal;color:var(--g2);}
-.cta-s{font-size:15px;color:rgba(255,255,255,.6);margin-bottom:32px;}
+/* ==== PRICING ==== */
+.pricing{background:linear-gradient(180deg,#fff 0%,var(--soft) 100%)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch}
+.plan{background:#fff;border:1.5px solid var(--border);border-radius:24px;padding:34px 28px;display:flex;flex-direction:column;transition:.25s;position:relative}
+.plan:hover{transform:translateY(-4px);box-shadow:var(--shadow-md)}
+.plan.featured{border-color:var(--g2);box-shadow:0 24px 60px rgba(245,180,41,.18);transform:scale(1.02)}
+.plan.featured:hover{transform:scale(1.02) translateY(-4px)}
+.plan-tag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--g2),var(--g));color:var(--ink);font-size:11.5px;font-weight:900;padding:5px 18px;border-radius:30px;box-shadow:0 6px 16px rgba(245,180,41,.35)}
+.plan-name{font-family:'Tajawal',sans-serif;font-size:18px;font-weight:900;color:var(--ink);margin-bottom:6px}
+.plan-desc{font-size:13px;color:var(--muted);margin-bottom:22px;min-height:36px}
+.plan-price{display:flex;align-items:baseline;gap:6px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border)}
+.plan-amt{font-family:'Tajawal',sans-serif;font-size:42px;font-weight:900;color:var(--ink);line-height:1}
+.plan-cur{font-size:15px;color:var(--text);font-weight:700}
+.plan-per{font-size:13px;color:var(--muted)}
+.plan-feats{list-style:none;margin-bottom:24px;flex:1}
+.plan-feats li{font-size:13.5px;color:var(--text);padding:8px 0;display:flex;align-items:flex-start;gap:9px;line-height:1.6}
+.plan-feats li::before{content:'✓';color:#16a34a;font-weight:900;flex-shrink:0;margin-top:1px}
+.plan-feats li.muted{color:var(--muted)}
+.plan-feats li.muted::before{content:'—';color:var(--muted)}
+.plan-btn{padding:13px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--ink);transition:.2s;text-align:center;display:block}
+.plan-btn:hover{border-color:var(--b3);background:var(--b4)}
+.plan.featured .plan-btn{background:linear-gradient(135deg,var(--g2),var(--g));border-color:transparent;color:var(--ink);box-shadow:0 8px 24px rgba(245,180,41,.3)}
+.plan.featured .plan-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(245,180,41,.45)}
 
-/* FOOTER */
-footer{background:var(--b);padding:48px 24px 24px;}
-.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:36px;}
-.footer-brand p{font-size:12px;color:rgba(255,255,255,.4);line-height:1.8;margin-top:10px;max-width:240px;}
-.fc h4{font-size:11px;font-weight:800;color:#fff;margin-bottom:12px;letter-spacing:1px;}
-.fc ul{list-style:none;display:flex;flex-direction:column;gap:7px;}
-.fc ul li a{font-size:12px;color:rgba(255,255,255,.4);text-decoration:none;transition:.2s;}
-.fc ul li a:hover{color:var(--g2);}
-.footer-bottom{max-width:1100px;margin:0 auto;border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.footer-bottom p{font-size:11px;color:rgba(255,255,255,.3);}
-.footer-bottom .fb-right{font-size:11px;color:rgba(255,255,255,.3);}
+/* ==== FAQ ==== */
+.faq-list{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.faq-item{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:.2s}
+.faq-item:hover{border-color:rgba(34,81,211,.25)}
+.faq-item[open]{box-shadow:var(--shadow-sm);border-color:rgba(34,81,211,.25)}
+.faq-q{padding:20px 24px;cursor:pointer;font-weight:800;font-size:15px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;list-style:none;gap:14px}
+.faq-q::-webkit-details-marker{display:none}
+.faq-q::after{content:'+';font-size:22px;color:var(--b3);font-weight:400;transition:transform .25s;flex-shrink:0;line-height:1}
+.faq-item[open] .faq-q::after{transform:rotate(45deg)}
+.faq-a{padding:0 24px 22px;font-size:14px;color:var(--text);line-height:1.85}
 
-/* WhatsApp Float */
-.wa-float{position:fixed;bottom:20px;left:20px;width:56px;height:56px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(37,211,102,.4);z-index:9999;transition:transform .25s;}
-.wa-float:hover{transform:scale(1.1);}
+/* ==== CTA BANNER ==== */
+.cta-band{background:linear-gradient(135deg,var(--b) 0%,var(--b2) 100%);position:relative;overflow:hidden;text-align:center;color:#fff}
+.cta-band::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(245,180,41,.12) 0%,transparent 60%)}
+.cta-band::after{content:'';position:absolute;bottom:-100px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(34,81,211,.3) 0%,transparent 60%)}
+.cta-inner{position:relative;z-index:1;max-width:680px;margin:0 auto}
+.cta-band h2{font-family:'Tajawal',sans-serif;font-size:clamp(28px,4vw,40px);font-weight:900;margin-bottom:16px;color:#fff}
+.cta-band p{font-size:15.5px;color:rgba(255,255,255,.78);margin-bottom:30px;line-height:1.8}
 
+/* ==== FOOTER ==== */
+footer{background:#06143A;color:rgba(255,255,255,.7);padding:60px 24px 28px}
+.foot-grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px}
+.foot-brand .nav-logo{font-size:30px;margin-bottom:14px}
+.foot-tag{font-size:13.5px;line-height:1.8;color:rgba(255,255,255,.55);max-width:280px}
+.foot-col h4{font-family:'Tajawal',sans-serif;color:#fff;font-size:14px;font-weight:900;margin-bottom:18px}
+.foot-col ul{list-style:none}
+.foot-col li{margin-bottom:10px}
+.foot-col a{font-size:13px;color:rgba(255,255,255,.6);transition:.2s}
+.foot-col a:hover{color:var(--g2)}
+.foot-bot{max-width:1180px;margin:0 auto;padding-top:24px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;font-size:12px;color:rgba(255,255,255,.45)}
+.foot-bot a{color:rgba(255,255,255,.55)}
+.foot-bot a:hover{color:var(--g2)}
+
+/* ==== MOBILE ==== */
 @media(max-width:900px){
-  .nav-toggle{display:block;}
-  .nav-links{display:none;position:absolute;top:100%;right:0;left:0;background:rgba(11,31,78,.98);flex-direction:column;padding:18px 24px;gap:14px;border-top:1px solid rgba(255,255,255,.08);}
-  .nav-links.open{display:flex;}
-  .nav-links li{width:100%;}
-  .nav-links a{display:block;padding:8px 0;}
-  .steps{grid-template-columns:repeat(2,1fr);}
-  .steps::before{display:none;}
-  .feat-grid{grid-template-columns:1fr;}
-  .feat.big{grid-column:span 1;}
-  .plans{grid-template-columns:1fr;}
-  .plan.pop{transform:none;}
-  .plan.pop:hover{transform:translateY(-5px);}
-  .footer-inner{grid-template-columns:1fr 1fr;}
-  .about-inner{grid-template-columns:1fr;text-align:center;}
-  .about-badges{justify-content:center;}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .steps,.features-grid,.tests-grid,.plans{grid-template-columns:1fr}
+  .plan.featured{transform:none}
+  .plan.featured:hover{transform:translateY(-4px)}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:30px}
+  section{padding:64px 0}
+  .ct-row{grid-template-columns:1.4fr 1fr 1fr}
+  .ct-cell{padding:14px 12px;font-size:12.5px}
+  .nav-toggle{display:block}
+  .nav-links{position:fixed;top:64px;left:0;right:0;background:rgba(11,31,78,.98);backdrop-filter:blur(20px);flex-direction:column;padding:20px 24px;gap:14px;border-top:1px solid rgba(255,255,255,.06);max-height:0;overflow:hidden;transition:max-height .3s ease;align-items:stretch}
+  .nav-links.open{max-height:600px;padding:20px 24px}
+  .nav-links a{padding:8px 0;font-size:15px}
+  .nav-cta{text-align:center;margin-top:8px}
+}
+@media(max-width:520px){
+  .foot-grid{grid-template-columns:1fr}
+  .container{padding:0 18px}
+  .hero{padding:100px 18px 60px}
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <a href="/" class="nav-logo"><span class="n5">5</span><span class="nt">tars</span></a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#how">كيف يعمل</a></li>
-    <li><a href="#features">المميزات</a></li>
-    <li><a href="#pricing">الأسعار</a></li>
-    <li><a href="#about">عن المنصة</a></li>
-    <li><a href="#faq">الأسئلة</a></li>
-    <li><a href="/login.html" style="color:rgba(255,255,255,.85)">دخول</a></li>
-    <li><a href="/signup.html" class="nav-cta">جرّب مجاناً ←</a></li>
-  </ul>
-  <button class="nav-toggle" aria-label="فتح القائمة" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><span class="n5">5</span><span class="nt">tars</span></a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#how" onclick="closeNav()">كيف يعمل</a></li>
+      <li><a href="#features" onclick="closeNav()">المميزات</a></li>
+      <li><a href="#pricing" onclick="closeNav()">الأسعار</a></li>
+      <li><a href="#faq" onclick="closeNav()">الأسئلة</a></li>
+      <li><a href="/login.html">دخول</a></li>
+      <li><a href="/signup.html" class="nav-cta">جرّب مجاناً ←</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="فتح القائمة" onclick="toggleNav()">☰</button>
+  </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-inner">
     <div class="hero-badge"><span class="dot"></span>المنصة العربية الأولى لإدارة تقييمات Google</div>
     <h1>اجعل مشروعك يصل<br>لـ <em>5 نجوم ★★★★★</em><br>بشكل آلي</h1>
-    <p class="hero-sub">راقب تقييماتك على Google، ارد عليها بالذكاء الاصطناعي باللهجة العربية، واطلب تقييمات من عملائك — كل هذا بدون تدخل يومي.</p>
+    <p class="hero-sub">راقب تقييماتك على Google، رد عليها بالذكاء الاصطناعي باللهجة العربية، واطلب تقييمات من عملائك — كل هذا بدون تدخل يومي.</p>
     <div class="hero-btns">
-      <button class="btn-hero btn-gold" onclick="location.href='/signup.html'">ابدأ تجربتك المجانية 14 يوم ←</button>
-      <button class="btn-hero btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">كيف يعمل؟</button>
+      <a href="/signup.html" class="btn-hero btn-gold">ابدأ تجربتك المجانية 14 يوم ←</a>
+      <a href="#how" class="btn-hero btn-ghost">كيف يعمل؟</a>
     </div>
     <p class="hero-trust">✓ بدون بطاقة ائتمان &nbsp;·&nbsp; ✓ إلغاء في أي وقت &nbsp;·&nbsp; ✓ دعم بالعربي</p>
     <div class="hero-stats">
@@ -273,19 +274,335 @@ footer{background:var(--b);padding:48px 24px 24px;}
   </div>
 </section>
 
-<!-- PROOF -->
 <div class="proof">
   <div class="proof-item">🍽️ مطاعم</div><div class="proof-sep"></div>
   <div class="proof-item">💇 صالونات</div><div class="proof-sep"></div>
   <div class="proof-item">🏥 عيادات</div><div class="proof-sep"></div>
   <div class="proof-item">☕ كافيهات</div><div class="proof-sep"></div>
   <div class="proof-item">🛍️ متاجر تجزئة</div><div class="proof-sep"></div>
-  <div class="proof-item">🇸🇦 يفهم اللهجات العربية</div>
+  <div class="proof-item">🇸🇦 يفهم اللهجات الخليجية</div>
 </div>
 
-<!-- HOW -->
 <section class="how" id="how">
   <div class="container">
-    <div class="eyebrow">⚡ كيف يعمل</div>
-    <h2 class="sec-title">4 خطوات <span>وأنت جاهز</span></h2>
-    <p class="sec-sub">الإعداد لا يأ
+    <div class="sec-head">
+      <div class="eyebrow">⚡ كيف يعمل</div>
+      <h2 class="sec-title">4 خطوات <span>وأنت جاهز</span></h2>
+      <p class="sec-sub">الإعداد لا يأخذ أكثر من 5 دقائق. ربط مشروعك بمنصة 5tars يتم بنقرة واحدة.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-icon">🔗</div>
+        <h3>اربط مشروعك</h3>
+        <p>الصق رابط Google Maps لمشروعك — نسحب البيانات تلقائياً.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-icon">⚙️</div>
+        <h3>اختر أسلوب الرد</h3>
+        <p>رسمي، ودود، أو لهجة محلية — تختار الأسلوب الذي يناسب عملاءك.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-icon">📲</div>
+        <h3>وزّع QR الذكي</h3>
+        <p>نولّد لك QR Code ولوحة طلب تقييم بنقرة واحدة من العميل.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-icon">📈</div>
+        <h3>تابع نموّك</h3>
+        <p>تنبيهات واتساب لكل تقييم جديد، ولوحة تحليلات مباشرة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="container">
+    <div class="sec-head">
+      <div class="eyebrow">✨ المميزات</div>
+      <h2 class="sec-title">كل ما تحتاجه <span>في منصة واحدة</span></h2>
+      <p class="sec-sub">مصممة خصيصاً للسوق السعودي والخليجي — بالعربي، باللهجة، وبفهم احتياجات أصحاب الأعمال المحلية.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat">
+        <div class="feat-icon">🤖</div>
+        <h3>ردود ذكية بالعربي</h3>
+        <p>ذكاء اصطناعي يرد على تقييمات عملائك بأسلوب طبيعي يناسب لهجتك ونوع نشاطك — بدون قوالب جامدة.</p>
+        <span class="feat-tag">يفهم الخليجي والمصري والشامي</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📱</div>
+        <h3>تنبيهات واتساب فورية</h3>
+        <p>كل ما يجيك تقييم جديد، يصلك إشعار على واتساب فوراً — تقدر ترد بنفسك أو تخلي الذكاء يرد.</p>
+        <span class="feat-tag">تكامل مباشر مع UltraMSG</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🎯</div>
+        <h3>QR Code ذكي قابل للتتبع</h3>
+        <p>كل عميل يمسح الـ QR، نسجّل الزيارة. تعرف أي قناة تجيب لك أكثر تقييمات (طاولة، فاتورة، كيس).</p>
+        <span class="feat-tag">تتبع UTM متقدم</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🔍</div>
+        <h3>تشخيص ملف Google</h3>
+        <p>تقرير فوري يكشف نقاط الضعف في ملف نشاطك على Google ويعطيك خطة عملية للتحسين.</p>
+        <span class="feat-tag">مجاني للجميع</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🕵️</div>
+        <h3>مراقبة المنافسين</h3>
+        <p>أدخل رابط منافسك، نعطيك مقارنة كاملة: التقييمات، السرعة، التفاعل، نقاط الضعف عنده.</p>
+        <span class="feat-tag">حصري للسوق المحلي</span>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">📊</div>
+        <h3>لوحة تحليلات مباشرة</h3>
+        <p>متابعة لحظية: متوسط التقييم، نمو التقييمات، توزيع النجوم، الكلمات الأكثر تكراراً.</p>
+        <span class="feat-tag">تحديث كل 6 ساعات</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="compare">
+  <div class="container">
+    <div class="sec-head">
+      <div class="eyebrow">⚖️ المقارنة</div>
+      <h2 class="sec-title">لماذا <span>5tars</span>؟</h2>
+      <p class="sec-sub">منصات إدارة التقييمات الأجنبية لا تفهم سوقنا. هذي الفرق:</p>
+    </div>
+    <div class="compare-table">
+      <div class="ct-row head">
+        <div class="ct-cell">الميزة</div>
+        <div class="ct-cell">5tars</div>
+        <div class="ct-cell">منصات أجنبية</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell title">دعم اللهجات العربية</div>
+        <div class="ct-cell us"><span class="ct-yes">✓</span> طبيعي 100%</div>
+        <div class="ct-cell them">ترجمة آلية</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell title">تنبيهات واتساب</div>
+        <div class="ct-cell us"><span class="ct-yes">✓</span> فوري</div>
+        <div class="ct-cell them">إيميل فقط غالباً</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell title">الفوترة بالريال</div>
+        <div class="ct-cell us"><span class="ct-yes">✓</span> ريال + فاتورة ضريبية</div>
+        <div class="ct-cell them">دولار + تحويل</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell title">الدعم الفني</div>
+        <div class="ct-cell us"><span class="ct-yes">✓</span> عربي · واتساب</div>
+        <div class="ct-cell them">إنجليزي · إيميل</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell title">السعر للنشاط الواحد</div>
+        <div class="ct-cell us"><span class="ct-yes">✓</span> يبدأ من 49 ر.س</div>
+        <div class="ct-cell them">200+ ر.س عادة</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="container">
+    <div class="sec-head">
+      <div class="eyebrow">💬 آراء العملاء</div>
+      <h2 class="sec-title">قصص حقيقية <span>من عملاء حقيقيين</span></h2>
+    </div>
+    <div class="tests-grid">
+      <div class="test">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">"تقييماتي كانت 4.1 وارتفعت لـ 4.7 خلال شهرين. الردود التلقائية باللهجة وفّرت علي ساعات يومياً."</p>
+        <div class="test-author">
+          <div class="test-avatar">س</div>
+          <div>
+            <div class="test-name">سعد القحطاني</div>
+            <div class="test-role">صاحب مطعم · الرياض</div>
+          </div>
+        </div>
+      </div>
+      <div class="test">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">"الـ QR اللي يطبعونه على الفاتورة جابلي 80 تقييم في أول شهر. قبل كنت أحصل بالكاد 5."</p>
+        <div class="test-author">
+          <div class="test-avatar">ن</div>
+          <div>
+            <div class="test-name">نورة الشمري</div>
+            <div class="test-role">صالون تجميل · جدة</div>
+          </div>
+        </div>
+      </div>
+      <div class="test">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-quote">"تنبيه الواتساب الفوري خلاني أتعامل مع أي تقييم سلبي قبل ما يكبر. الفرق صار محسوس على المراجعات."</p>
+        <div class="test-author">
+          <div class="test-avatar">ع</div>
+          <div>
+            <div class="test-name">د. عبدالله المطيري</div>
+            <div class="test-role">عيادة أسنان · الدمام</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="sec-head">
+      <div class="eyebrow">💎 الأسعار</div>
+      <h2 class="sec-title">باقات <span>تناسب نموّك</span></h2>
+      <p class="sec-sub">ابدأ مجاناً 14 يوم بدون بطاقة. ترقّى لما تحس إن الفرق يستاهل.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <div class="plan-name">البداية</div>
+        <div class="plan-desc">للمشاريع الصغيرة وفروع التجربة</div>
+        <div class="plan-price"><span class="plan-amt">49</span><span class="plan-cur">ر.س</span><span class="plan-per">/شهر</span></div>
+        <ul class="plan-feats">
+          <li>نشاط واحد</li>
+          <li>مراقبة تقييمات Google</li>
+          <li>50 رد ذكي شهرياً</li>
+          <li>QR Code قابل للتتبع</li>
+          <li>تنبيهات إيميل</li>
+          <li class="muted">تنبيهات واتساب</li>
+          <li class="muted">مراقبة منافسين</li>
+        </ul>
+        <a href="/signup.html" class="plan-btn">ابدأ مجاناً</a>
+      </div>
+      <div class="plan featured">
+        <div class="plan-tag">الأكثر اختياراً</div>
+        <div class="plan-name">النموّ</div>
+        <div class="plan-desc">للمشاريع الجادة في توسيع حضورها</div>
+        <div class="plan-price"><span class="plan-amt">149</span><span class="plan-cur">ر.س</span><span class="plan-per">/شهر</span></div>
+        <ul class="plan-feats">
+          <li>حتى 3 أنشطة</li>
+          <li>مراقبة تقييمات Google</li>
+          <li>ردود ذكية غير محدودة</li>
+          <li>QR Code قابل للتتبع</li>
+          <li>تنبيهات واتساب فورية</li>
+          <li>مراقبة منافس واحد</li>
+          <li>تقارير شهرية مفصّلة</li>
+        </ul>
+        <a href="/signup.html" class="plan-btn">ابدأ مجاناً</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">السلاسل</div>
+        <div class="plan-desc">للسلاسل والشركات متعددة الفروع</div>
+        <div class="plan-price"><span class="plan-amt">299</span><span class="plan-cur">ر.س</span><span class="plan-per">/شهر</span></div>
+        <ul class="plan-feats">
+          <li>أنشطة غير محدودة</li>
+          <li>مراقبة تقييمات Google</li>
+          <li>ردود ذكية غير محدودة</li>
+          <li>QR لكل فرع</li>
+          <li>تنبيهات واتساب فورية</li>
+          <li>مراقبة 5 منافسين</li>
+          <li>API + مدير حساب مخصص</li>
+        </ul>
+        <a href="/signup.html" class="plan-btn">ابدأ مجاناً</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="sec-head">
+      <div class="eyebrow">❓ الأسئلة الشائعة</div>
+      <h2 class="sec-title">سؤالك <span>غالباً موجود هنا</span></h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">كيف يعمل الذكاء الاصطناعي في الرد على التقييمات؟</summary>
+        <div class="faq-a">نستخدم نماذج لغوية مدرّبة على ردود نشاطات سعودية وخليجية حقيقية. تختار الأسلوب (رسمي / ودود / لهجة) ونوع نشاطك، والذكاء يولّد رد طبيعي 100%. تقدر تراجعه قبل النشر أو تخليه آلي.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">هل أحتاج ربط حساب Google Business الخاص بي؟</summary>
+        <div class="faq-a">في البداية لا — نسحب التقييمات من رابط Google Maps العام مباشرة. الردود في الإصدار الحالي تنشرها أنت بنقرة (ننسخ الرد جاهز). الربط الكامل مع Google Business Profile قادم قريباً للنشر التلقائي.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">هل التجربة المجانية تتطلب بطاقة ائتمان؟</summary>
+        <div class="faq-a">لا، أبداً. تسجّل بإيميلك أو حساب Google، وتستخدم المنصة 14 يوم بدون أي تفاصيل دفع. لا فيه خصم تلقائي بعد التجربة — تختار الباقة بنفسك لما تكون جاهز.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">هل يمكنني الإلغاء في أي وقت؟</summary>
+        <div class="faq-a">نعم. الإلغاء بنقرة واحدة من لوحة الحساب. لا فيه رسوم إلغاء ولا فترة تنبيه. لو ألغيت، اشتراكك يستمر شغّال لنهاية الشهر المدفوع.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">هل هذي الخدمة قانونية؟ Google يسمح بها؟</summary>
+        <div class="faq-a">نعم 100%. نحن لا نزوّر تقييمات ولا نشتريها. كل ما نسوّيه: نسهّل عليك طلب تقييم من عملائك الحقيقيين، ونساعدك ترد عليهم باحترافية. هذا ضمن إرشادات Google.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">هل تصدرون فاتورة ضريبية؟</summary>
+        <div class="faq-a">نعم. كل اشتراك يصدر له فاتورة ضريبية مفصّلة متوافقة مع متطلبات هيئة الزكاة والضريبة السعودية، تنزّلها من حسابك مباشرة.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">كم وقت يأخذ الإعداد؟</summary>
+        <div class="faq-a">5 دقائق. تسجّل، تلصق رابط Google Maps لنشاطك، تختار أسلوب الرد، وتطبع الـ QR. خلاص — المنصة شغّالة.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="cta-inner">
+    <h2>جاهز ترفع تقييم مشروعك؟</h2>
+    <p>14 يوم مجاناً، بدون بطاقة. شوف الفرق بنفسك قبل ما تدفع ريال.</p>
+    <a href="/signup.html" class="btn-hero btn-gold">ابدأ تجربتك الآن ←</a>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <div class="nav-logo"><span class="n5">5</span><span class="nt">tars</span></div>
+      <p class="foot-tag">المنصة العربية الأولى لإدارة تقييمات Google. مصنوعة في السعودية، للسوق السعودي والخليجي.</p>
+    </div>
+    <div class="foot-col">
+      <h4>المنصة</h4>
+      <ul>
+        <li><a href="#features">المميزات</a></li>
+        <li><a href="#pricing">الأسعار</a></li>
+        <li><a href="#how">كيف يعمل</a></li>
+        <li><a href="#faq">الأسئلة الشائعة</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>الحساب</h4>
+      <ul>
+        <li><a href="/signup.html">إنشاء حساب</a></li>
+        <li><a href="/login.html">تسجيل الدخول</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h4>قانوني</h4>
+      <ul>
+        <li><a href="/terms.html">الشروط والأحكام</a></li>
+        <li><a href="/privacy.html">سياسة الخصوصية</a></li>
+        <li><a href="/refund.html">سياسة الاسترداد</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <div>© 2026 5tars · جميع الحقوق محفوظة</div>
+    <div>صُنع بـ ❤️ في السعودية 🇸🇦</div>
+  </div>
+</footer>
+
+<script>
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+function closeNav(){document.getElementById('navLinks').classList.remove('open');}
+window.addEventListener('scroll',function(){
+  var n=document.getElementById('nav');
+  if(window.scrollY>20){n.style.background='rgba(11,31,78,.96)';}else{n.style.background='rgba(11,31,78,.85)';}
+});
+</script>
+
+</body>
+</html>
